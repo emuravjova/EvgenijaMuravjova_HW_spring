@@ -4,8 +4,6 @@ import lombok.Data;
 
 @Data
 public class Car {
-    private int id;
+    private String name;
     private String model;
-    private double price;
-    private String owner;
 }
