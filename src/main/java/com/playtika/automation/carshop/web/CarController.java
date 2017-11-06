@@ -23,24 +23,32 @@ public class CarController {
 
     @RequestMapping(method = RequestMethod.GET)
     public Collection<CarStorage> getAllCars(){
+        log.info("All available cars with selling details has been returned");
         return cars.values();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity getCarDetailsById(@PathVariable("id") int id){
         if (cars.containsKey(id)) {
+            log.info("Car selling details with id = {} has been successfully returned", id);
             return new ResponseEntity<>(cars.get(id).getCarSaleDetails(), HttpStatus.OK);
         }
-        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        else {
+            log.warn("Car with id = {} not found, sale details cannot be returned", id);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);}
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity deleteCarById(@PathVariable("id") int id){
         if (cars.containsKey(id)) {
             cars.remove(id);
+            log.info("Car with id = {} has been successfully removed", id);
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        else {
+            log.warn("Car with id = {} not found, cannot be removed", id);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @RequestMapping(
