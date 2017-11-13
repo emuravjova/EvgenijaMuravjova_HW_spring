@@ -40,10 +40,10 @@ public class CarServiceImplTest {
     @Test
     public void shouldGetCarDetailsById() {
         Map<String,Object> expectedCarDetails = new HashMap<>();
-        expectedCarDetails.put("price",12000d);
+        expectedCarDetails.put("price",12000);
         expectedCarDetails.put("contacts","Den 0501234567");
         Car car = new Car("BMW","2010");
-        CarSaleDetails expectedCar = carService.addCar(car, (Double) expectedCarDetails.get("price"), (String) expectedCarDetails.get("contacts"));
+        CarSaleDetails expectedCar = carService.addCar(car, (int) expectedCarDetails.get("price"), (String) expectedCarDetails.get("contacts"));
         assertThat(carService.getCarDetailsById(expectedCar.getId()), equalTo(expectedCarDetails));
     }
 
@@ -66,7 +66,7 @@ public class CarServiceImplTest {
     }
 
     @Test (dependsOnMethods = {"carShouldBeStored"})
-    public void shouldDeleteCarByIdEvenIfNoSuchId() {
+    public void shouldNotDeleteAnyCarIfNoSuchId() {
         Car car1 = new Car("BMW","2010");
         Car car2 = new Car("Lexus","2018");
         CarSaleDetails carToDelete = carService.addCar(car1, 12000, "Den 0501234567");
@@ -93,9 +93,8 @@ public class CarServiceImplTest {
         Car car = new Car("BMW","2010");
         car.setModel("2010");
         car.setName("BMW");
-        CarSaleDetails carToStore = carService.addCar(car, 12000, "Den 0501234567");
-        long idOfStoredCar = carToStore.getId();
-        assertThat(idOfStoredCar, greaterThan(0L));
+        CarSaleDetails storedCar = carService.addCar(car, 12000, "Den 0501234567");
+        assertThat(storedCar.getId(), greaterThan(0L));
     }
 
 }

@@ -4,7 +4,7 @@ import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.service.CarServiceImpl;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,7 +16,6 @@ import java.util.Map;
 @RequestMapping("/cars")
 public class CarController {
 
-    @Autowired
     private final CarServiceImpl carService;
 
     @GetMapping
@@ -37,11 +36,10 @@ public class CarController {
     @PostMapping
     public CarSaleDetails addCar(
             @Valid @RequestBody Car car,
-            @RequestParam("price") double price,
-            @RequestParam("contacts") String contacts)
+            @NotEmpty @RequestParam("price") int price,
+            @NotEmpty @RequestParam("contacts") String contacts)
     {
         return carService.addCar(car, price, contacts);
     }
-
 
 }

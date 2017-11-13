@@ -51,7 +51,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public CarSaleDetails addCar(Car car, double price, String contacts) {
+    public CarSaleDetails addCar(Car car, int price, String contacts) {
         CarSaleDetails carSaleDetails = new CarSaleDetails(ID.getAndAdd(1),car,price,contacts);
         CARS.put(carSaleDetails.getId(), carSaleDetails);
         log.info("New car with id {} has been added for selling: {}", CARS.get(carSaleDetails.getId()).getId(), CARS.get(carSaleDetails.getId()));
