@@ -2,6 +2,7 @@ package com.playtika.automation.carshop.web;
 
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
+import com.playtika.automation.carshop.service.CarService;
 import com.playtika.automation.carshop.service.CarServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public class CarControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CarServiceImpl carService;
+    private CarService carService;
 
 
     @Test

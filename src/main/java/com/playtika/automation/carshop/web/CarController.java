@@ -2,9 +2,11 @@ package com.playtika.automation.carshop.web;
 
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
+import com.playtika.automation.carshop.service.CarService;
 import com.playtika.automation.carshop.service.CarServiceImpl;
 import lombok.AllArgsConstructor;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,7 +18,7 @@ import java.util.Map;
 @RequestMapping("/cars")
 public class CarController {
 
-    private final CarServiceImpl carService;
+    private final CarService carService;
 
     @GetMapping
     public Collection<CarSaleDetails> getAllCars(){
