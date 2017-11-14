@@ -8,7 +8,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -24,20 +28,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class CarControllerTest {
+@RunWith(SpringRunner.class)
+@WebMvcTest(CarController.class)
+public class CarControllerIntegrationTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private CarServiceImpl carService;
 
-    @Before
-    public void init() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(new CarController(carService))
-                .build();
-    }
-
-    private MockMvc mockMvc;
 
     @Test
     public void shouldReturn200withJsonOnGetAllCars() throws Exception {
