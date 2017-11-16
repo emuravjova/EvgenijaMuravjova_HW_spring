@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface CarService {
     Collection<CarSaleDetails> getAllCars();
-    Map<String,Object> getCarDetailsById(long id);
+    CarSaleDetails getCarDetailsById(long id);
     void deleteCarById(long id);
-    CarSaleDetails addCar(Car car, int price, String contacts);
+    CarSaleDetails addCar(CarSaleDetails carToAdd);
 }
