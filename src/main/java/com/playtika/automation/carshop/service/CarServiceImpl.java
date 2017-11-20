@@ -1,14 +1,12 @@
 package com.playtika.automation.carshop.service;
 
-import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
-import com.playtika.automation.carshop.web.dto.SaleInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,24 +24,10 @@ public class CarServiceImpl implements CarService {
         return CARS.values();
     }
 
-//    @Override
-//    public Map<String, Object> getCarDetailsById(long id) {
-//        Map <String,Object> response = new HashMap<>();
-//        if (CARS.containsKey(id)) {
-//            response.put("price",CARS.get(id).getPrice());
-//            response.put("contacts",CARS.get(id).getContacts());
-//            log.info("Car selling details with id = {} has been successfully returned", id);
-//            return response;
-//        } else {
-//            log.warn("Car with id = {} not found, sale details cannot be returned", id);
-//            return response;
-//        }
-//    }
-
     @Override
-    public CarSaleDetails getCarDetailsById(long id) {
-        CarSaleDetails carDetails = CARS.get(id);
-        if (carDetails != null) {
+    public Optional<CarSaleDetails> getCarDetailsById(long id) {
+        Optional<CarSaleDetails> carDetails = Optional.ofNullable(CARS.get(id));
+        if (carDetails.isPresent()) {
             log.info("Car selling details with id = {} has been successfully returned", id);
         }
         return carDetails;

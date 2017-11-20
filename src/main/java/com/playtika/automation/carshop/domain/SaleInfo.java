@@ -1,10 +1,10 @@
-package com.playtika.automation.carshop.web.dto;
+package com.playtika.automation.carshop.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Created by emuravjova on 11/16/2017.
+ * Created by emuravjova on 11/20/2017.
  */
 @Data
 @AllArgsConstructor

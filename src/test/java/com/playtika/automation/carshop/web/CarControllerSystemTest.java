@@ -26,8 +26,8 @@ public class CarControllerSystemTest {
                     .body("id", greaterThan(0))
                     .body("car.name", equalTo("BMW"))
                     .body("car.model", equalTo("2010"))
-                    .body("contacts", equalTo("Bob 0969876543"))
-                    .body("price", equalTo(25000))
+                    .body("saleInfo.contacts", equalTo("Bob 0969876543"))
+                    .body("saleInfo.price", equalTo(25000))
                     .statusCode(200);
     }
 
@@ -51,8 +51,8 @@ public class CarControllerSystemTest {
                 .when().get("/cars").jsonPath();
         assert(jsonResponse.get("find { it.id == "+ id +" }.car.name").equals(car.getName()));
         assert(jsonResponse.get("find { it.id == "+ id +" }.car.model").equals(car.getModel()));
-        assert(jsonResponse.get("find { it.id == "+ id +" }.contacts").equals("Bob 0969876543"));
-        assert(jsonResponse.get("find { it.id == "+ id +" }.price").equals(25000));
+        assert(jsonResponse.get("find { it.id == "+ id +" }.saleInfo.contacts").equals("Bob 0969876543"));
+        assert(jsonResponse.get("find { it.id == "+ id +" }.saleInfo.price").equals(25000));
     }
 
     @Test
