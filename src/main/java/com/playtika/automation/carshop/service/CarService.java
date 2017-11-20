@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface CarService {
     Collection<CarSaleDetails> getAllCars();
     Optional<CarSaleDetails> getCarDetailsById(long id);
-    void deleteCarById(long id);
+    boolean deleteCarById(long id);
     CarSaleDetails addCar(CarSaleDetails carToAdd);
 }

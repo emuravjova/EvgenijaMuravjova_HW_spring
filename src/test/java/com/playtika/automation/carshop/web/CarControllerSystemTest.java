@@ -1,7 +1,7 @@
 package com.playtika.automation.carshop.web;
 
 import com.playtika.automation.carshop.domain.Car;
-import com.playtika.automation.carshop.domain.CarSaleDetails;
+import com.playtika.automation.carshop.web.dto.CarId;
 import io.restassured.path.json.JsonPath;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,17 +18,13 @@ public class CarControllerSystemTest {
     @Test
     public void shouldAddCar() throws Exception {
         Car car = new Car("BMW", "2010");
-                given()
+        given()
                 .contentType("application/json")
                 .body(car)
                 .when().post("/cars?price=25000&contacts=Bob 0969876543")
                 .then()
-                    .body("id", greaterThan(0))
-                    .body("car.name", equalTo("BMW"))
-                    .body("car.model", equalTo("2010"))
-                    .body("saleInfo.contacts", equalTo("Bob 0969876543"))
-                    .body("saleInfo.price", equalTo(25000))
-                    .statusCode(200);
+                .body("id", greaterThan(0))
+                .statusCode(200);
     }
 
     @Test
@@ -64,12 +60,11 @@ public class CarControllerSystemTest {
     }
 
     private long addCarAndGetId(Car car){
-        long id = given()
+        return given()
                 .contentType("application/json")
                 .body(car)
                 .when().post("/cars?price=25000&contacts=Bob 0969876543")
                 .andReturn().getBody()
-                .as(CarSaleDetails.class).getId();
-        return id;
+                .as(CarId.class).getId();
     }
 }

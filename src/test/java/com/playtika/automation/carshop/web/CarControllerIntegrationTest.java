@@ -2,8 +2,8 @@ package com.playtika.automation.carshop.web;
 
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
-import com.playtika.automation.carshop.service.CarService;
 import com.playtika.automation.carshop.domain.SaleInfo;
+import com.playtika.automation.carshop.service.CarService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Collections.emptySet;
 import static org.mockito.Mockito.*;
@@ -77,9 +79,16 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn200onCarRemoving() throws Exception {
-        doNothing().when(carService).deleteCarById(1L);
+        when(carService.deleteCarById(1L)).thenReturn(true);
         mockMvc.perform(delete("/cars/1"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturn204onCarRemoving() throws Exception {
+        when(carService.deleteCarById(1L)).thenReturn(false);
+        mockMvc.perform(delete("/cars/1"))
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -91,11 +100,7 @@ public class CarControllerIntegrationTest {
                 .content(createCarInJson(carSaleDetails.getCar().getName(),carSaleDetails.getCar().getModel())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.car.name").value("BMW"))
-                .andExpect(jsonPath("$.car.model").value("2010"))
-                .andExpect(jsonPath("$.saleInfo.price").value(25000))
-                .andExpect(jsonPath("$.saleInfo.contacts").value("Bob 0969876543"));
+                .andExpect(jsonPath("$.id").value(1L));
     }
 
     @Test

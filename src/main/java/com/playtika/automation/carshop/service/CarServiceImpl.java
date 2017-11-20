@@ -35,10 +35,14 @@ public class CarServiceImpl implements CarService {
 
 
     @Override
-    public void deleteCarById(long id) {
+    public boolean deleteCarById(long id) {
         if (CARS.remove(id) == null){
             log.warn("Car with id = {} does not exist, cannot be removed", id);
-        } else {log.info("Car with id = {} has been successfully removed", id);}
+            return false;
+        } else {
+            log.info("Car with id = {} has been successfully removed", id);
+            return true;
+        }
     }
 
     @Override
