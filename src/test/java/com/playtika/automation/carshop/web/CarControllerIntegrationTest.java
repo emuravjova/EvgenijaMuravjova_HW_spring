@@ -10,8 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -35,7 +39,7 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn200withJsonOnGetAllCars() throws Exception {
-        Car car = new Car("BMW","2010");
+        Car car = new Car("BMW", "2010");
         Set<CarSaleDetails> availableCars = Collections.singleton (new CarSaleDetails(1L, car, new SaleInfo(12000, "Ron 0982345678")));
         when(carService.getAllCars()).thenReturn(availableCars);
         mockMvc.perform(get("/cars"))
@@ -60,7 +64,7 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn200withJsonOnGetCarDetailsById() throws Exception {
-        Optional<CarSaleDetails> expectedCarDetails = Optional.of(createCarSaleDetails());
+        Optional<CarSaleDetails> expectedCarDetails = Optional.of(createCarSaleDetails("BMW", "2010", 25000, "Bob 0969876543"));
         when(carService.getCarDetailsById(1)).thenReturn(expectedCarDetails);
         mockMvc.perform(get("/cars/1"))
                 .andExpect(status().isOk())
@@ -93,11 +97,9 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn200withJsonOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails();
-        when(carService.addCar(carSaleDetails)).thenReturn(carSaleDetails);
-        mockMvc.perform(post("/cars?price=25000&contacts=Bob 0969876543")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(createCarInJson(carSaleDetails.getCar().getName(),carSaleDetails.getCar().getModel())))
+        CarSaleDetails carSaleDetails = createCarSaleDetails("BMW", "2010", 25000, "Bob 0969876543");
+        when(carService.addCar(carSaleDetails)).thenReturn(1L);
+        postCar(String.valueOf(25000),"Bob 0969876543",createCarInJson("BMW","2010"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.id").value(1L));
@@ -105,9 +107,11 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn400whenNoCarProvidedOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails();
-        when(carService.addCar(carSaleDetails)).thenReturn(carSaleDetails);
-        mockMvc.perform(post("/cars?price=25000&contacts=Bob 0969876543")
+        CarSaleDetails carSaleDetails = createCarSaleDetails("BMW", "2010", 25000, "Bob 0969876543");
+        when(carService.addCar(carSaleDetails)).thenReturn(1L);
+        mockMvc.perform(post("/cars")
+                .param("price", String.valueOf(carSaleDetails.getSaleInfo().getPrice()))
+                .param("contacts", carSaleDetails.getSaleInfo().getContacts())
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isBadRequest());
         verify(carService, never()).addCar(carSaleDetails);
@@ -115,44 +119,48 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn400whenEmptyCarProvidedOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails();
-        when(carService.addCar(carSaleDetails)).thenReturn(carSaleDetails);
-        mockMvc.perform(post("/cars?price=25000&contacts=Bob 0969876543")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(createCarInJson("","")))
+        CarSaleDetails carSaleDetails = createCarSaleDetails("", "", 25000, "Bob 0969876543");
+        when(carService.addCar(carSaleDetails)).thenReturn(1L);
+        postCar(String.valueOf(25000), "Bob 0969876543", createCarInJson("",""))
                 .andExpect(status().isBadRequest());
         verify(carService, never()).addCar(carSaleDetails);
     }
 
     @Test
     public void shouldReturn400whenNoCarDetailsOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails();
-        when(carService.addCar(carSaleDetails)).thenReturn(carSaleDetails);
-        mockMvc.perform(post("/cars")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(createCarInJson(carSaleDetails.getCar().getName(),carSaleDetails.getCar().getModel())))
+        CarSaleDetails carSaleDetails = createCarSaleDetails("BMW", "2010", 25000, null);
+        when(carService.addCar(carSaleDetails)).thenReturn(1L);
+        postCar(null, null, createCarInJson("BMW","2010"))
                 .andExpect(status().isBadRequest());
         verify(carService, never()).addCar(carSaleDetails);
     }
 
     @Test
     public void shouldReturn400whenCarDetailsAreEmptyOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails();
-        when(carService.addCar(carSaleDetails)).thenReturn(carSaleDetails);
-        mockMvc.perform(post("/cars?price=&contacts=")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(createCarInJson(carSaleDetails.getCar().getName(),carSaleDetails.getCar().getModel())))
+        CarSaleDetails carSaleDetails = createCarSaleDetails("BMW", "2010", 25000, "");
+        postCar("", "", createCarInJson("BMW","2010"))
                 .andExpect(status().isBadRequest());
         verify(carService, never()).addCar(carSaleDetails);
     }
 
-    private static String createCarInJson (String name, String model) {
-        return "{ \"name\": \"" + name + "\", " + "\"model\":\"" + model + "\"}";
+    private static String createCarInJson(String name, String model) {
+        return String.format("{ \"name\": \"%s\", \"model\":\"%s\"}", name, model);
 
     }
 
-    private static CarSaleDetails createCarSaleDetails(){
-        Car car = new Car("BMW", "2010");
-        return new CarSaleDetails(1L, car, new SaleInfo(25000, "Bob 0969876543"));
+    private static CarSaleDetails createCarSaleDetails(String name, String model, int price, String contacts){
+        Car car = new Car(name, model);
+        CarSaleDetails createdCarDetails = new CarSaleDetails();
+        createdCarDetails.setCar(car);
+        createdCarDetails.setSaleInfo(new SaleInfo(price, contacts));
+        return createdCarDetails;
+    }
+
+    private ResultActions postCar(String price, String contacts, String body) throws Exception {
+        return mockMvc.perform(post("/cars")
+                .param("price", price)
+                .param("contacts", contacts)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(body));
     }
 }

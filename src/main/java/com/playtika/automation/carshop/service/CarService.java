@@ -11,5 +11,5 @@ public interface CarService {
     Collection<CarSaleDetails> getAllCars();
     Optional<CarSaleDetails> getCarDetailsById(long id);
     boolean deleteCarById(long id);
-    CarSaleDetails addCar(CarSaleDetails carToAdd);
+    long addCar(CarSaleDetails carToAdd);
 }

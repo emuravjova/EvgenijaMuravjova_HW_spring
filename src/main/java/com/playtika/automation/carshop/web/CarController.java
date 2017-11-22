@@ -23,23 +23,23 @@ public class CarController {
     private final CarService carService;
 
     @GetMapping
-    public Collection<CarSaleDetails> getAllCars(){
+    public Collection<CarSaleDetails> getAllCars() {
         return carService.getAllCars();
     }
 
     @GetMapping(value = "/{id}")
-    public SaleInfo getCarDetailsById(@PathVariable("id") long id){
+    public SaleInfo getCarDetailsById(@PathVariable("id") long id) {
         return carService.getCarDetailsById(id)
                 .orElseThrow(() -> new CarNotFoundException("Unable to find car with id " + id))
                 .getSaleInfo();
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deleteCarById(@PathVariable("id") long id){
+    public ResponseEntity<Void> deleteCarById(@PathVariable("id") long id) {
        if (carService.deleteCarById(id)) {
-           return new ResponseEntity<Void>(HttpStatus.OK);
+           return new ResponseEntity<>(HttpStatus.OK);
        } else {
-           return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+           return new ResponseEntity<>(HttpStatus.NO_CONTENT);
        }
     }
 
@@ -47,12 +47,11 @@ public class CarController {
     public CarId addCar(
             @Valid @RequestBody Car car,
             @NotEmpty @RequestParam("price") int price,
-            @NotEmpty @RequestParam("contacts") String contacts)
-    {
+            @NotEmpty @RequestParam("contacts") String contacts) {
         CarSaleDetails carToAdd = new CarSaleDetails();
         carToAdd.setCar(car);
         carToAdd.setSaleInfo(new SaleInfo(price, contacts));
-        return new CarId(carService.addCar(carToAdd).getId());
+        return new CarId(carService.addCar(carToAdd));
     }
 
 }

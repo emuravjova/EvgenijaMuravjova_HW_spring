@@ -59,7 +59,7 @@ public class CarControllerSystemTest {
         given().when().get("/cars").then().assertThat().body("id",not(hasValue(id)));
     }
 
-    private long addCarAndGetId(Car car){
+    private long addCarAndGetId(Car car) {
         return given()
                 .contentType("application/json")
                 .body(car)

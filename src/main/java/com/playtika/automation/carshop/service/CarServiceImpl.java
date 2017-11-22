@@ -27,30 +27,28 @@ public class CarServiceImpl implements CarService {
     @Override
     public Optional<CarSaleDetails> getCarDetailsById(long id) {
         Optional<CarSaleDetails> carDetails = Optional.ofNullable(CARS.get(id));
-        if (carDetails.isPresent()) {
-            log.info("Car selling details with id = {} has been successfully returned", id);
-        }
+        log.info("Following car details has been returned by id {}: {}", id, carDetails);
         return carDetails;
     }
 
 
     @Override
     public boolean deleteCarById(long id) {
-        if (CARS.remove(id) == null){
+        if (CARS.remove(id) == null) {
             log.warn("Car with id = {} does not exist, cannot be removed", id);
             return false;
-        } else {
-            log.info("Car with id = {} has been successfully removed", id);
-            return true;
         }
+        log.info("Car with id = {} has been successfully removed", id);
+        return true;
     }
 
     @Override
-    public CarSaleDetails addCar(CarSaleDetails carToAdd) {
-        carToAdd.setId(ID.getAndAdd(1));
+    public long addCar(CarSaleDetails carToAdd) {
+        long id = ID.getAndAdd(1);
+        carToAdd.setId(id);
         CARS.put(carToAdd.getId(), carToAdd);
-        log.info("New car with id {} has been added for selling: {}", CARS.get(carToAdd.getId()).getId(), CARS.get(carToAdd.getId()));
-        return carToAdd;
+        log.info("New car with id {} has been added for selling: {}", id, carToAdd);
+        return id;
     }
 
 }
