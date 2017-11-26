@@ -1,0 +1,38 @@
+DROP TABLE IF EXISTS car;
+DROP TABLE IF EXISTS seller;
+DROP TABLE IF EXISTS offer;
+DROP TABLE IF EXISTS deal;
+
+CREATE TABLE IF NOT EXISTS car (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  number VARCHAR(20) NOT NULL,
+  brand  VARCHAR(20) NOT NULL,
+  year INTEGER NOT NULL,
+  color VARCHAR(15) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS seller (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(20) NOT NULL,
+  contacts  VARCHAR(70) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS offer (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  car_id BIGINT NOT NULL,
+  seller_id  BIGINT NOT NULL,
+  price INTEGER check (price > 0),
+  deal_id BIGINT,
+FOREIGN KEY (car_id) REFERENCES car(id),
+FOREIGN KEY (seller_id) REFERENCES seller(id),
+UNIQUE (car_id, deal_id)
+);
+
+CREATE TABLE IF NOT EXISTS deal (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  sale_id BIGINT NOT NULL,
+  price INTEGER check (price > 0),
+  state ENUM('active', 'rejected', 'accepted'),
+  date DATE NOT NULL,
+FOREIGN KEY (sale_id) REFERENCES offer(id)
+);
