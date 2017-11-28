@@ -1,16 +1,13 @@
 package com.playtika.automation.carshop.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude={"id"})
+@EqualsAndHashCode(exclude={"carId"})
 public class CarSaleDetails {
-    private long id;
+    private long carId;
     private Car car;
     private SaleInfo saleInfo;
 }

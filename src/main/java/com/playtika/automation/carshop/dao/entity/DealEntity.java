@@ -23,9 +23,13 @@ public class DealEntity {
     @Check(constraints = "price > 0")
     private int price;
 
-    public static enum State {
-        ACTIVE, REJECTED, ACCEPTED
-    }
     @Column(columnDefinition = "ENUM('ACTIVE', 'REJECTED', 'ACCEPTED')", nullable = false)
     private State state;
+
+    @Column(name = "actual_date", columnDefinition = "DATE DEFAULT CURRENT_DATE")
+    private java.sql.Date startDate;
+
+    private enum State {
+        ACTIVE, REJECTED, ACCEPTED
+    }
 }

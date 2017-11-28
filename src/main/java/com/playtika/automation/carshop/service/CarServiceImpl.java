@@ -7,6 +7,7 @@ import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.domain.SaleInfo;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +21,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class CarServiceImpl implements CarService {
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     @Override
     public Collection<CarSaleDetails> getAllCars() {
@@ -40,12 +41,11 @@ public class CarServiceImpl implements CarService {
     @Override
     public Optional<CarSaleDetails> getCarDetailsById(long id) {
         List<OfferEntity> offers = entityManager.createQuery("from OfferEntity o where car_id=:id and deal_id is null", OfferEntity.class).setParameter("id", id).getResultList();
-        if (offers.isEmpty()){
-            return Optional.empty();
-        }
-        CarSaleDetails carDetails = getCarSaleDetailsFromOffer((OfferEntity) offers.get(0));
+        Optional<CarSaleDetails> carDetails = offers.stream()
+                .findFirst()
+                .map(CarServiceImpl::getCarSaleDetailsFromOffer);
         log.info("Following car details has been returned by id {}: {}", id, carDetails);
-        return Optional.of(carDetails);
+        return carDetails;
     }
 
     @Transactional
@@ -62,32 +62,73 @@ public class CarServiceImpl implements CarService {
     @Transactional
     @Override
     public long addCar(CarSaleDetails carDetails) {
-        List<CarEntity> alreadyStoredCar = entityManager.createQuery("from CarEntity where number=:number", CarEntity.class).setParameter("number", carDetails.getCar().getNumber()).getResultList();
-        if (alreadyStoredCar.isEmpty()){
-            CarEntity newCar = new CarEntity(carDetails.getCar().getNumber(), carDetails.getCar().getBrand(), carDetails.getCar().getYear(), carDetails.getCar().getColor());
-            entityManager.persist(newCar);
+        Optional<CarEntity> storedCarOptional = findCarByNumber(carDetails);
+        if (!storedCarOptional.isPresent()) {
+            CarEntity newCar = persistCar(carDetails.getCar());
             storeNewOffer(carDetails, newCar);
             log.info("New car {} with id {} has been added for selling, contacts: {}", carDetails.getCar(), newCar.getId(), carDetails.getSaleInfo());
             return newCar.getId();
-        } else {
-            List<OfferEntity> activeCarOffers = entityManager.createQuery("from OfferEntity where car=:car and deal_id is null", OfferEntity.class).setParameter("car", alreadyStoredCar.get(0)).getResultList();
-            if (activeCarOffers.isEmpty()){
-                storeNewOffer(carDetails, alreadyStoredCar.get(0));
-                log.info("Car {} with id {} has been added for selling one more time, contacts: {}", carDetails.getCar(), alreadyStoredCar.get(0).getId(), carDetails.getSaleInfo());
-                return alreadyStoredCar.get(0).getId();
-            }
         }
-        throw new IllegalArgumentException("Such car is already selling!");
+
+        CarEntity storedCar = storedCarOptional.get();
+        boolean offerAlreadyExist = isOfferAlreadyExist(storedCar);
+        if (offerAlreadyExist) {
+            throw new IllegalArgumentException("Such car is already selling!");
+        }
+
+        storeNewOffer(carDetails, storedCar);
+        log.info("Car {} with id {} has been added for selling one more time, contacts: {}", carDetails.getCar(), storedCar.getId(), carDetails.getSaleInfo());
+        return storedCar.getId();
+
     }
 
-    private static CarSaleDetails getCarSaleDetailsFromOffer(OfferEntity offer){
-        return new CarSaleDetails(offer.getId(), new Car(offer.getCar().getNumber(), offer.getCar().getBrand(), offer.getCar().getYear(), offer.getCar().getColor()), new SaleInfo(offer.getPrice(), offer.getSeller().getContacts()));
+    private boolean isOfferAlreadyExist(CarEntity storedCar) {
+        List<OfferEntity> activeCarOffers = entityManager.createQuery("from OfferEntity where car=:car and deal_id is null", OfferEntity.class).setParameter("car", storedCar).getResultList();
+        return !activeCarOffers.isEmpty();
     }
 
-    private void storeNewOffer(CarSaleDetails carDetails, CarEntity car){
-        SellerEntity newSeller = new SellerEntity("John doe", carDetails.getSaleInfo().getContacts());
-        entityManager.persist(newSeller);
-        OfferEntity newOffer = new OfferEntity(car, newSeller, carDetails.getSaleInfo().getPrice(), null);
+    private Optional<CarEntity> findCarByNumber(CarSaleDetails carDetails) {
+        List<CarEntity> alreadyStoredCars = entityManager.createQuery("from CarEntity where number=:number", CarEntity.class).setParameter("number", carDetails.getCar().getNumber()).getResultList();
+        return alreadyStoredCars.stream().findFirst();
+    }
+
+    private CarEntity persistCar(Car car) {
+        CarEntity newCar = new CarEntity(car.getNumber(), car.getBrand(), car.getYear(), car.getColor());
+        entityManager.persist(newCar);
+        return newCar;
+    }
+
+    private static CarSaleDetails getCarSaleDetailsFromOffer(OfferEntity offer) {
+        CarEntity entityCar = offer.getCar();
+        Car car = new Car(entityCar.getNumber(), entityCar.getBrand(), entityCar.getYear(), entityCar.getColor());
+        SaleInfo info = new SaleInfo(offer.getPrice(), offer.getSeller().getContacts());
+        return new CarSaleDetails(entityCar.getId(), car, info);
+    }
+
+    private void storeNewOffer(CarSaleDetails carDetails, CarEntity car) {
+        Optional<SellerEntity> storedSellerOptional = findSellerByContact(carDetails);
+        if (!storedSellerOptional.isPresent()) {
+            SellerEntity newSeller = persistSeller(carDetails.getSaleInfo());
+            persistOffer(carDetails.getSaleInfo().getPrice(), car, newSeller);
+        } else {
+            SellerEntity storedSeller = storedSellerOptional.get();
+            persistOffer(carDetails.getSaleInfo().getPrice(), car, storedSeller);
+        }
+    }
+
+    private Optional<SellerEntity> findSellerByContact(CarSaleDetails carDetails) {
+        List<SellerEntity> alreadyStoredSellers = entityManager.createQuery("from SellerEntity where contacts=:contacts", SellerEntity.class).setParameter("contacts", carDetails.getSaleInfo().getContacts()).getResultList();
+        return alreadyStoredSellers.stream().findFirst();
+    }
+
+    private void persistOffer(int price, CarEntity car, SellerEntity seller) {
+        OfferEntity newOffer = new OfferEntity(car, seller, price);
         entityManager.persist(newOffer);
+    }
+
+    private SellerEntity persistSeller(SaleInfo info) {
+        SellerEntity newSeller = new SellerEntity("John doe", info.getContacts());
+        entityManager.persist(newSeller);
+        return newSeller;
     }
 }

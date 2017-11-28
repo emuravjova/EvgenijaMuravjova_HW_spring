@@ -10,7 +10,9 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "offer")
+@Table(name = "offer", uniqueConstraints={
+        @UniqueConstraint(columnNames = {"car_id", "deal_id"})
+})
 public class OfferEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,7 +22,7 @@ public class OfferEntity {
     @JoinColumn (name = "car_id", nullable = false)
     private CarEntity car;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn (name = "seller_id", nullable = false)
     private SellerEntity seller;
 
@@ -28,14 +30,12 @@ public class OfferEntity {
     @Check(constraints = "price > 0")
     private int price;
 
-    @OneToMany(mappedBy = "offer")
     @Column(name = "deal_id")
-    private List<DealEntity> deal;
+    private Long acceptedDeal;
 
-    public OfferEntity(CarEntity car, SellerEntity seller, int price, List<DealEntity> deal) {
+    public OfferEntity(CarEntity car, SellerEntity seller, int price) {
         this.car = car;
         this.seller = seller;
         this.price = price;
-        this.deal = deal;
     }
 }

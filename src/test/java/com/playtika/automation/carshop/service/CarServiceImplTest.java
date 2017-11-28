@@ -25,11 +25,11 @@ public class CarServiceImplTest {
     private CarService carService;
 
     @Autowired
-    private EntityManager em;
+    private EntityManager entityManager;
 
     @Before
     public void init() {
-        carService = new CarServiceImpl(em);
+        carService = new CarServiceImpl(entityManager);
     }
 
     @Test
@@ -38,8 +38,8 @@ public class CarServiceImplTest {
     }
 
     @Test
-    public void shouldReturnAllAvailableCars(){
-        Car car = new Car("AS123","BMW", 2007,"blue");
+    public void shouldReturnAllAvailableCars() {
+        Car car = new Car("AS123", "BMW", 2007, "blue");
         CarSaleDetails carToAdd = new CarSaleDetails(1L, car, new SaleInfo(12000, "Den 0501234567"));
         carService.addCar(carToAdd);
         Collection<CarSaleDetails> availableCars = carService.getAllCars();
@@ -49,7 +49,7 @@ public class CarServiceImplTest {
 
     @Test
     public void shouldGetCarDetailsById() {
-        Car car = new Car("AS123","BMW", 2007,"blue");
+        Car car = new Car("AS123", "BMW", 2007, "blue");
         CarSaleDetails carToAdd = new CarSaleDetails(1L, car, new SaleInfo(12000, "Den 0501234567"));
         long id = carService.addCar(carToAdd);
         assertThat(carService.getCarDetailsById(id), equalTo(java.util.Optional.of(carToAdd)));
@@ -62,13 +62,13 @@ public class CarServiceImplTest {
 
     @Test
     public void shouldDeleteCarById() {
-        Car car1 = new Car("AS123","BMW", 2007,"blue");
+        Car car1 = new Car("AS123", "BMW", 2007, "blue");
         CarSaleDetails carToAdd = new CarSaleDetails(1L, car1, new SaleInfo(12000, "Den 0501234567"));
-        Car car2 = new Car("AS124","Lexus", 2007,"green");
+        Car car2 = new Car("AS124", "Lexus", 2007, "green");
         CarSaleDetails carToDelete = new CarSaleDetails(2L, car2, new SaleInfo(25000, "Ron 0502345678"));
         carService.addCar(carToAdd);
         carService.addCar(carToDelete);
-        carService.deleteCarById(carToDelete.getId());
+        carService.deleteCarById(carToDelete.getCarId());
         Collection<CarSaleDetails> availableCars = carService.getAllCars();
         assertThat(availableCars, not(hasItem(carToDelete)));
         assertThat(availableCars, hasItem(carToAdd));
@@ -77,7 +77,7 @@ public class CarServiceImplTest {
 
     @Test
     public void shouldNotDeleteAnyCarIfNoSuchId() {
-        Car car = new Car("AS123","BMW", 2007,"blue");
+        Car car = new Car("AS123", "BMW", 2007, "blue");
         CarSaleDetails storedCar = new CarSaleDetails(1L, car, new SaleInfo(12000, "Den 0501234567"));
         carService.addCar(storedCar);
         carService.deleteCarById(100500);
@@ -88,7 +88,7 @@ public class CarServiceImplTest {
 
     @Test
     public void carShouldBeStored() {
-        Car car = new Car("AS123","BMW", 2007,"blue");
+        Car car = new Car("AS123", "BMW", 2007, "blue");
         CarSaleDetails storedCar = new CarSaleDetails(0L, car, new SaleInfo(12000, "Den 0501234567"));
         long id = carService.addCar(storedCar);
         Collection<CarSaleDetails> availableCars = carService.getAllCars();

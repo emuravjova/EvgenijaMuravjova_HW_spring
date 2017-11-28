@@ -17,7 +17,7 @@ public class SellerEntity {
     @Column(nullable = false, length = 20)
     private String name;
 
-    @Column(nullable = false, length = 70)
+    @Column(unique = true, nullable = false, length = 70)
     private String contacts;
 
     public SellerEntity(String name, String contacts) {

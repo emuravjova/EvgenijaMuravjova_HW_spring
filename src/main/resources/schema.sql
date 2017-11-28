@@ -33,6 +33,6 @@ CREATE TABLE IF NOT EXISTS deal (
   sale_id BIGINT NOT NULL,
   price INTEGER check (price > 0),
   state ENUM('active', 'rejected', 'accepted'),
-  date DATE NOT NULL,
+  actual_date date NOT NULL DEFAULT GETDATE(),
 FOREIGN KEY (sale_id) REFERENCES offer(id)
 );
