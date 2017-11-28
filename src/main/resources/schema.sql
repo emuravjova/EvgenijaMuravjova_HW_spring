@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS deal;
 
 CREATE TABLE IF NOT EXISTS car (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  number VARCHAR(20) NOT NULL,
+  number VARCHAR(20) NOT NULL UNIQUE,
   brand  VARCHAR(20) NOT NULL,
   year INTEGER NOT NULL,
   color VARCHAR(15) NOT NULL
@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS offer (
   seller_id  BIGINT NOT NULL,
   price INTEGER check (price > 0),
   deal_id BIGINT,
-FOREIGN KEY (car_id) REFERENCES car(id),
-FOREIGN KEY (seller_id) REFERENCES seller(id),
+FOREIGN KEY (car_id) REFERENCES car(id) ON DELETE CASCADE,
+FOREIGN KEY (seller_id) REFERENCES seller(id) ON DELETE CASCADE,
 UNIQUE (car_id, deal_id)
 );
 

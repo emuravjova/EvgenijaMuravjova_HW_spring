@@ -39,15 +39,17 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn200withJsonOnGetAllCars() throws Exception {
-        Car car = new Car("BMW", "2010");
+        Car car = new Car("AS123","BMW", 2007,"blue");
         Set<CarSaleDetails> availableCars = Collections.singleton (new CarSaleDetails(1L, car, new SaleInfo(12000, "Ron 0982345678")));
         when(carService.getAllCars()).thenReturn(availableCars);
         mockMvc.perform(get("/cars"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].car.name").value("BMW"))
-                .andExpect(jsonPath("$[0].car.model").value("2010"))
+                .andExpect(jsonPath("$[0].car.number").value("AS123"))
+                .andExpect(jsonPath("$[0].car.brand").value("BMW"))
+                .andExpect(jsonPath("$[0].car.year").value(2007))
+                .andExpect(jsonPath("$[0].car.color").value("blue"))
                 .andExpect(jsonPath("$[0].saleInfo.price").value(12000))
                 .andExpect(jsonPath("$[0].saleInfo.contacts").value("Ron 0982345678"));
 
@@ -64,13 +66,13 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn200withJsonOnGetCarDetailsById() throws Exception {
-        Optional<CarSaleDetails> expectedCarDetails = Optional.of(createCarSaleDetails("BMW", "2010", 25000, "Bob 0969876543"));
+        Optional<CarSaleDetails> expectedCarDetails = Optional.of(createCarSaleDetails());
         when(carService.getCarDetailsById(1)).thenReturn(expectedCarDetails);
         mockMvc.perform(get("/cars/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.price").value(25000))
-                .andExpect(jsonPath("$.contacts").value("Bob 0969876543"));
+                .andExpect(jsonPath("$.contacts").value("0979179745"));
     }
 
     @Test
@@ -97,9 +99,9 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn200withJsonOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails("BMW", "2010", 25000, "Bob 0969876543");
+        CarSaleDetails carSaleDetails = createCarSaleDetails();
         when(carService.addCar(carSaleDetails)).thenReturn(1L);
-        postCar(String.valueOf(25000),"Bob 0969876543",createCarInJson("BMW","2010"))
+        postCar(String.valueOf(25000),"Bob 0969876543",createCarInJson("AS123","BMW", 2007,"blue"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.id").value(1L));
@@ -107,7 +109,7 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn400whenNoCarProvidedOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails("BMW", "2010", 25000, "Bob 0969876543");
+        CarSaleDetails carSaleDetails = createCarSaleDetails();
         when(carService.addCar(carSaleDetails)).thenReturn(1L);
         mockMvc.perform(post("/cars")
                 .param("price", String.valueOf(carSaleDetails.getSaleInfo().getPrice()))
@@ -119,40 +121,40 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn400whenEmptyCarProvidedOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails("", "", 25000, "Bob 0969876543");
+        CarSaleDetails carSaleDetails = createCarSaleDetails();
         when(carService.addCar(carSaleDetails)).thenReturn(1L);
-        postCar(String.valueOf(25000), "Bob 0969876543", createCarInJson("",""))
+        postCar(String.valueOf(25000), "Bob 0969876543", createCarInJson("","", null, ""))
                 .andExpect(status().isBadRequest());
         verify(carService, never()).addCar(carSaleDetails);
     }
 
     @Test
     public void shouldReturn400whenNoCarDetailsOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails("BMW", "2010", 25000, null);
+        CarSaleDetails carSaleDetails = createCarSaleDetails();
         when(carService.addCar(carSaleDetails)).thenReturn(1L);
-        postCar(null, null, createCarInJson("BMW","2010"))
+        postCar(null, null, createCarInJson("AS123","BMW", 2007,"blue"))
                 .andExpect(status().isBadRequest());
         verify(carService, never()).addCar(carSaleDetails);
     }
 
     @Test
     public void shouldReturn400whenCarDetailsAreEmptyOnAddCar() throws Exception {
-        CarSaleDetails carSaleDetails = createCarSaleDetails("BMW", "2010", 25000, "");
-        postCar("", "", createCarInJson("BMW","2010"))
+        CarSaleDetails carSaleDetails = createCarSaleDetails();
+        postCar("", "", createCarInJson("AS123","BMW", 2007,"blue"))
                 .andExpect(status().isBadRequest());
         verify(carService, never()).addCar(carSaleDetails);
     }
 
-    private static String createCarInJson(String name, String model) {
-        return String.format("{ \"name\": \"%s\", \"model\":\"%s\"}", name, model);
+    private static String createCarInJson(String number, String brand, Integer year, String color) {
+        return String.format("{ \"number\": \"%s\", \"brand\":\"%s\", \"year\": %s, \"color\":\"%s\"}", number, brand, year, color);
 
     }
 
-    private static CarSaleDetails createCarSaleDetails(String name, String model, int price, String contacts){
-        Car car = new Car(name, model);
+    private static CarSaleDetails createCarSaleDetails(){
+        Car car = new Car("AS123","BMW", 2007,"blue");
         CarSaleDetails createdCarDetails = new CarSaleDetails();
         createdCarDetails.setCar(car);
-        createdCarDetails.setSaleInfo(new SaleInfo(price, contacts));
+        createdCarDetails.setSaleInfo(new SaleInfo(25000, "0979179745"));
         return createdCarDetails;
     }
 

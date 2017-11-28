@@ -16,7 +16,7 @@ public class OfferEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn (name = "car_id", nullable = false)
     private CarEntity car;
 

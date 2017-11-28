@@ -3,8 +3,14 @@ package com.playtika.automation.carshop.service;
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.domain.SaleInfo;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
 import java.util.Collection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -12,9 +18,19 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertTrue;
 
+@DataJpaTest
+@RunWith(SpringRunner.class)
 public class CarServiceImplTest {
 
-    private CarService carService = new CarServiceImpl();
+    private CarService carService;
+
+    @Autowired
+    private EntityManager em;
+
+    @Before
+    public void init() {
+        carService = new CarServiceImpl(em);
+    }
 
     @Test
     public void ifNoCarsPresentShouldReturnEmptyResult() {
@@ -23,7 +39,7 @@ public class CarServiceImplTest {
 
     @Test
     public void shouldReturnAllAvailableCars(){
-        Car car = new Car("BMW", "2010");
+        Car car = new Car("AS123","BMW", 2007,"blue");
         CarSaleDetails carToAdd = new CarSaleDetails(1L, car, new SaleInfo(12000, "Den 0501234567"));
         carService.addCar(carToAdd);
         Collection<CarSaleDetails> availableCars = carService.getAllCars();
@@ -33,7 +49,7 @@ public class CarServiceImplTest {
 
     @Test
     public void shouldGetCarDetailsById() {
-        Car car = new Car("BMW", "2010");
+        Car car = new Car("AS123","BMW", 2007,"blue");
         CarSaleDetails carToAdd = new CarSaleDetails(1L, car, new SaleInfo(12000, "Den 0501234567"));
         long id = carService.addCar(carToAdd);
         assertThat(carService.getCarDetailsById(id), equalTo(java.util.Optional.of(carToAdd)));
@@ -46,9 +62,9 @@ public class CarServiceImplTest {
 
     @Test
     public void shouldDeleteCarById() {
-        Car car1 = new Car("BMW", "2010");
+        Car car1 = new Car("AS123","BMW", 2007,"blue");
         CarSaleDetails carToAdd = new CarSaleDetails(1L, car1, new SaleInfo(12000, "Den 0501234567"));
-        Car car2 = new Car("Lexus", "2018");
+        Car car2 = new Car("AS124","Lexus", 2007,"green");
         CarSaleDetails carToDelete = new CarSaleDetails(2L, car2, new SaleInfo(25000, "Ron 0502345678"));
         carService.addCar(carToAdd);
         carService.addCar(carToDelete);
@@ -61,7 +77,7 @@ public class CarServiceImplTest {
 
     @Test
     public void shouldNotDeleteAnyCarIfNoSuchId() {
-        Car car = new Car("BMW", "2010");
+        Car car = new Car("AS123","BMW", 2007,"blue");
         CarSaleDetails storedCar = new CarSaleDetails(1L, car, new SaleInfo(12000, "Den 0501234567"));
         carService.addCar(storedCar);
         carService.deleteCarById(100500);
@@ -72,8 +88,8 @@ public class CarServiceImplTest {
 
     @Test
     public void carShouldBeStored() {
-        Car car = new Car("BMW", "2010");
-        CarSaleDetails storedCar = new CarSaleDetails(1L, car, new SaleInfo(12000, "Den 0501234567"));
+        Car car = new Car("AS123","BMW", 2007,"blue");
+        CarSaleDetails storedCar = new CarSaleDetails(0L, car, new SaleInfo(12000, "Den 0501234567"));
         long id = carService.addCar(storedCar);
         Collection<CarSaleDetails> availableCars = carService.getAllCars();
         assertThat(id, greaterThan(0L));

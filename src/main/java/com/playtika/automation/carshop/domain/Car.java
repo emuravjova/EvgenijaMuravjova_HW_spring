@@ -10,10 +10,21 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 public class Car {
+//    @NotEmpty
+//    @NotNull
+//    private String name;
+//    @NotEmpty
+//    @NotNull
+//    private String model;
     @NotEmpty
     @NotNull
-    private String name;
+    private String number;
     @NotEmpty
     @NotNull
-    private String model;
+    private String brand;
+    @NotNull
+    private Integer year;
+    @NotEmpty
+    @NotNull
+    private String color;
 }

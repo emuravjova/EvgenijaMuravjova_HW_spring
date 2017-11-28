@@ -22,4 +22,10 @@ public class DealEntity {
     @Column(nullable = false)
     @Check(constraints = "price > 0")
     private int price;
+
+    public static enum State {
+        ACTIVE, REJECTED, ACCEPTED
+    }
+    @Column(columnDefinition = "ENUM('ACTIVE', 'REJECTED', 'ACCEPTED')", nullable = false)
+    private State state;
 }
