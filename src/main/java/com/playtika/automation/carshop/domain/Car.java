@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 
-@Data
+@Value
 @AllArgsConstructor
 public class Car {
     @NotEmpty

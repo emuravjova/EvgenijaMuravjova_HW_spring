@@ -7,7 +7,7 @@ import lombok.Value;
 /**
  * Created by emuravjova on 11/20/2017.
  */
-@Data
+@Value
 @AllArgsConstructor
 public class SaleInfo {
     private int price;
