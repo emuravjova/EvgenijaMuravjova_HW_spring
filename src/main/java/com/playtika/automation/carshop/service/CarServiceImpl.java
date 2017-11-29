@@ -83,7 +83,7 @@ public class CarServiceImpl implements CarService {
     }
 
     private boolean isOfferAlreadyExist(CarEntity storedCar) {
-        List<OfferEntity> activeCarOffers = entityManager.createQuery("from OfferEntity where car=:car and deal_id is null", OfferEntity.class).setParameter("car", storedCar).getResultList();
+        List<OfferEntity> activeCarOffers = entityManager.createQuery("from OfferEntity where car_id=:car_id and deal_id is null", OfferEntity.class).setParameter("car_id", storedCar.getId()).getResultList();
         return !activeCarOffers.isEmpty();
     }
 
