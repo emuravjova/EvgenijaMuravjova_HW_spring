@@ -31,7 +31,7 @@ public class OfferEntity {
     private int price;
 
     @Column(name = "deal_id")
-    private Long acceptedDeal;
+    private Long acceptedDealId;
 
     public OfferEntity(CarEntity car, SellerEntity seller, int price) {
         this.car = car;
