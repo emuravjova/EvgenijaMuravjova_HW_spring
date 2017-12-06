@@ -1,7 +1,7 @@
 package com.playtika.automation.carshop.dao.entity;
 
-import lombok.*;
-import org.hibernate.annotations.Check;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 

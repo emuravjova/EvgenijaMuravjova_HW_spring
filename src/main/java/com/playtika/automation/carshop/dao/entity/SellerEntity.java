@@ -1,6 +1,5 @@
 package com.playtika.automation.carshop.dao.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
