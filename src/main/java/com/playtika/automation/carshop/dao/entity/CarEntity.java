@@ -1,13 +1,11 @@
 package com.playtika.automation.carshop.dao.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Check;
 
 import javax.persistence.*;
 
-@Data
+@Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "car")
@@ -16,16 +14,12 @@ public class CarEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 20)
     private String number;
 
-    @Column(nullable = false, length = 20)
     private String brand;
 
-    @Column(nullable = false)
     private int year;
 
-    @Column(nullable = false, length = 15)
     private String color;
 
     public CarEntity(String number, String brand, int year, String color) {

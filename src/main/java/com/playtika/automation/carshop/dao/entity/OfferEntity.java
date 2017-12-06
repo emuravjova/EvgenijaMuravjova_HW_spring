@@ -1,37 +1,36 @@
 package com.playtika.automation.carshop.dao.entity;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Check;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@Table(name = "offer", uniqueConstraints={
-        @UniqueConstraint(columnNames = {"car_id", "deal_id"})
-})
+@Table(name = "offer")
 public class OfferEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
-    @JoinColumn (name = "car_id", nullable = false)
+    @JoinColumn (name = "car_id")
     private CarEntity car;
 
     @ManyToOne
-    @JoinColumn (name = "seller_id", nullable = false)
+    @JoinColumn (name = "seller_id")
     private SellerEntity seller;
 
-    @Column(nullable = false)
-    @Check(constraints = "price > 0")
     private int price;
 
+    @OneToMany(mappedBy = "offer")
     @Column(name = "deal_id")
-    private Long acceptedDealId;
+    private List<DealEntity> deal;
 
     public OfferEntity(CarEntity car, SellerEntity seller, int price) {
         this.car = car;
