@@ -1,8 +1,6 @@
 package com.playtika.automation.carshop.dao.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Check;
 
 import javax.persistence.*;
@@ -12,6 +10,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 @Table(name = "offer")
 public class OfferEntity {
     @Id

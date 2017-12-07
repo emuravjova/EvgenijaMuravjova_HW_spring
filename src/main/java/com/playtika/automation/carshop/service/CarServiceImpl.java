@@ -9,13 +9,9 @@ import com.playtika.automation.carshop.dao.entity.SellerEntity;
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.domain.SaleInfo;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +20,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 @Transactional
 public class CarServiceImpl implements CarService {
@@ -33,9 +28,15 @@ public class CarServiceImpl implements CarService {
     private final CarDao carRepo;
     private final SellerDao sellerRepo;
 
+    public CarServiceImpl(OfferDao offerRepo, CarDao carRepo, SellerDao sellerRepo) {
+        this.offerRepo = offerRepo;
+        this.carRepo = carRepo;
+        this.sellerRepo = sellerRepo;
+    }
+
     @Override
     public Collection<CarSaleDetails> getAllCars() {
-        List<OfferEntity> offers = offerRepo.findByDeal(null);
+        List<OfferEntity> offers = offerRepo.findByDealIsNull();
         log.info("All available cars with selling details has been returned");
         return offers.stream()
                 .map(CarServiceImpl::toCarSaleDetails)
@@ -44,7 +45,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Optional<CarSaleDetails> getCarDetailsById(long id) {
-        Optional<CarSaleDetails> carDetails = offerRepo.findByCarIdAndDeal(id, null)
+        Optional<CarSaleDetails> carDetails = offerRepo.findByCarIdAndDealIsNull(id)
                 .stream()
                 .findFirst()
                 .map(CarServiceImpl::toCarSaleDetails);
@@ -66,7 +67,7 @@ public class CarServiceImpl implements CarService {
     public long addCar(CarSaleDetails carDetails) {
         Optional<CarEntity> storedCarOptional = findCarByNumber(carDetails);
         CarEntity car = storedCarOptional.orElseGet(() -> persistCar(carDetails.getCar()));
-       boolean offerAlreadyExist = storedCarOptional.isPresent() && isOfferAlreadyExist(car);
+        boolean offerAlreadyExist = storedCarOptional.isPresent() && isOfferAlreadyExist(car);
         if (offerAlreadyExist) {
             throw new IllegalArgumentException("Such car is already selling!");
         }
@@ -78,9 +79,7 @@ public class CarServiceImpl implements CarService {
     }
 
     private boolean isOfferAlreadyExist(CarEntity storedCar) {
-        OfferEntity offer = new OfferEntity();
-        offer.setCar(storedCar);
-        return !offerRepo.exists(Example.of(offer));
+        return !offerRepo.findByCarIdAndDealIsNull(storedCar.getId()).isEmpty();
     }
 
     private Optional<CarEntity> findCarByNumber(CarSaleDetails carDetails) {
@@ -93,7 +92,7 @@ public class CarServiceImpl implements CarService {
 
     private CarEntity persistCar(Car car) {
         CarEntity newCar = new CarEntity(car.getNumber(), car.getBrand(), car.getYear(), car.getColor());
-        carRepo.save(newCar);
+        newCar = carRepo.save(newCar);
         log.info("New car {} with id {} has been added", car, newCar.getId());
         return newCar;
     }
