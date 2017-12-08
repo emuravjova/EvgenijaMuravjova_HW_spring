@@ -91,7 +91,6 @@ public class CarServiceImplTest {
         assertFalse(carService.deleteCarById(1L));
     }
 
-
     @Test
     public void newCarWithNewSellerShouldBeStored() {
         CarEntity carBeforeStore = new CarEntity("AS123", "BMW", 2007, "blue");

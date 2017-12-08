@@ -1,0 +1,8 @@
+<dataset>
+    <OFFER id ="1" car_id="1" seller_id="1" price="12000"/>
+    <OFFER id ="2" car_id="2" seller_id="1" price="15000" deal_id="1"/>
+    <CAR id ="1" number="AS123" brand="BMW" year="2007" color="blue"/>
+    <CAR id ="2" number="AD456" brand="Lexus" year="2012" color="green"/>
+    <SELLER id="1" name="Den" contacts="0501234567"/>
+    <DEAL id="1" sale_id="2" price ="10000" actual_date="2017-11-12"/>
+</dataset>
