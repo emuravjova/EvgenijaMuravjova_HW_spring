@@ -27,7 +27,7 @@ import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
 @DataJpaTest
 public class SellerDaoTest {
     @Autowired
-    protected JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Rule
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
@@ -36,7 +36,7 @@ public class SellerDaoTest {
     private SellerDao sellerDao;
 
     @Test
-    @DataSet("seller-table.xml")
+    @DataSet(value = "seller-table.xml", disableConstraints = true)
     public void shouldFindSellerByContact(){
         Optional<SellerEntity> actualFoundSeller = sellerDao.findFirstByContacts("0969258649");
         SellerEntity expectedSeller = new SellerEntity("Sam", "0969258649");
@@ -45,7 +45,7 @@ public class SellerDaoTest {
     }
 
     @Test
-    @DataSet("seller-table.xml")
+    @DataSet(value = "seller-table.xml", disableConstraints = true)
     public void shouldReturnEmptyResultIfNoSellerFound(){
         assertThat(sellerDao.findFirstByContacts("0961111111"), isEmpty());
     }

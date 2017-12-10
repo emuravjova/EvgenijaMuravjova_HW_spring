@@ -1,6 +1,7 @@
 package com.playtika.automation.carshop.dao;
 
 import com.github.database.rider.core.DBUnitRule;
+import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import com.playtika.automation.carshop.dao.entity.CarEntity;
@@ -30,7 +31,7 @@ import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
 public class CarDaoTest {
 
     @Autowired
-    protected JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Rule
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
@@ -39,7 +40,7 @@ public class CarDaoTest {
     private CarDao carDao;
 
     @Test
-    @DataSet("car-table.xml")
+    @DataSet(value = "car-table.xml", disableConstraints = true)
     public void shouldFindCarByNumber(){
         Optional<CarEntity> actualFoundCar = carDao.findFirstByNumber("AS123");
         CarEntity expectedCar = new CarEntity("AS123","BMW", 2007, "blue");
@@ -48,13 +49,13 @@ public class CarDaoTest {
     }
 
     @Test
-    @DataSet("car-table.xml")
+    @DataSet(value = "car-table.xml", disableConstraints = true)
     public void shouldReturnEmptyResultIfNoCarFound(){
         assertThat(carDao.findFirstByNumber("ADD123"), isEmpty());
     }
 
     @Test
-    @DataSet("car-table.xml")
+    @DataSet(value = "car-table.xml", disableConstraints = true)
     @ExpectedDataSet("empty-car-table.xml")
     @Commit
     public void shouldDeleteCarById(){

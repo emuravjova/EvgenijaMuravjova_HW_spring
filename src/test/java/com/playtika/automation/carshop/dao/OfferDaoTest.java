@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 public class OfferDaoTest {
 
     @Autowired
-    protected JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Rule
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
