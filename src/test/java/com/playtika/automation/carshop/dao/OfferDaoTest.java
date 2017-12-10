@@ -33,7 +33,7 @@ public class OfferDaoTest {
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
 
     @Autowired
-    protected OfferDao offerDao;
+    private OfferDao offerDao;
 
     @Test
     @DataSet("offers-table.xml")

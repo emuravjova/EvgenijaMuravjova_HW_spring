@@ -4,6 +4,7 @@ import com.github.database.rider.core.DBUnitRule;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import com.playtika.automation.carshop.dao.entity.CarEntity;
+import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +16,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
 
@@ -33,7 +36,7 @@ public class CarDaoTest {
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
 
     @Autowired
-    protected CarDao carDao;
+    private CarDao carDao;
 
     @Test
     @DataSet("car-table.xml")
@@ -41,7 +44,7 @@ public class CarDaoTest {
         Optional<CarEntity> actualFoundCar = carDao.findFirstByNumber("AS123");
         CarEntity expectedCar = new CarEntity("AS123","BMW", 2007, "blue");
         expectedCar.setId(1L);
-        assertThat(actualFoundCar.get(), samePropertyValuesAs(expectedCar));
+        assertThat(actualFoundCar.get(), equalTo(expectedCar));
     }
 
     @Test
@@ -55,6 +58,7 @@ public class CarDaoTest {
     @ExpectedDataSet("empty-car-table.xml")
     @Commit
     public void shouldDeleteCarById(){
-        carDao.deleteById(1L);
+        int countOfDeletedCar = carDao.deleteById(1L);
+        assertThat(countOfDeletedCar, is(1));
     }
 }

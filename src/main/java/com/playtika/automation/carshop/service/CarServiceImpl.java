@@ -9,6 +9,7 @@ import com.playtika.automation.carshop.dao.entity.SellerEntity;
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.domain.SaleInfo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,17 +23,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 
     private final OfferDao offerRepo;
     private final CarDao carRepo;
     private final SellerDao sellerRepo;
-
-    public CarServiceImpl(OfferDao offerRepo, CarDao carRepo, SellerDao sellerRepo) {
-        this.offerRepo = offerRepo;
-        this.carRepo = carRepo;
-        this.sellerRepo = sellerRepo;
-    }
 
     @Override
     public Collection<CarSaleDetails> getAllCars() {

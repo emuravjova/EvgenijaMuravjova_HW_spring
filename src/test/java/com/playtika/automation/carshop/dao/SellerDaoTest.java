@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
 
 /**
@@ -32,7 +33,7 @@ public class SellerDaoTest {
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
 
     @Autowired
-    protected SellerDao sellerDao;
+    private SellerDao sellerDao;
 
     @Test
     @DataSet("seller-table.xml")
@@ -40,7 +41,7 @@ public class SellerDaoTest {
         Optional<SellerEntity> actualFoundSeller = sellerDao.findFirstByContacts("0969258649");
         SellerEntity expectedSeller = new SellerEntity("Sam", "0969258649");
         expectedSeller.setId(1L);
-        assertThat(actualFoundSeller.get(), samePropertyValuesAs(expectedSeller));
+        assertThat(actualFoundSeller.get(), equalTo(expectedSeller));
     }
 
     @Test
