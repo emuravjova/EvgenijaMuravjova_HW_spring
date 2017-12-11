@@ -1,11 +1,13 @@
 package com.playtika.automation.carshop.dao.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 import org.springframework.data.couchbase.core.mapping.Document;
+import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
 import javax.persistence.*;
 
@@ -16,8 +18,9 @@ import javax.persistence.*;
 @Document
 public class DealEntity {
     @Id
-    @com.couchbase.client.java.repository.annotation.Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @com.couchbase.client.java.repository.annotation.Id
+    @org.springframework.data.couchbase.core.mapping.id.GeneratedValue
     private Long id;
 
     @ManyToOne

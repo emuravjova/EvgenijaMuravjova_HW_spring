@@ -4,22 +4,22 @@ import com.couchbase.client.java.repository.annotation.Field;
 import lombok.*;
 import org.hibernate.annotations.Check;
 import org.springframework.data.couchbase.core.mapping.Document;
+import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Table(name = "offer")
 @Document
 public class OfferEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @com.couchbase.client.java.repository.annotation.Id
+    @org.springframework.data.couchbase.core.mapping.id.GeneratedValue
     private Long id;
 
     @ManyToOne

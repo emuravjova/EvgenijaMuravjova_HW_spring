@@ -3,21 +3,20 @@ package com.playtika.automation.carshop.dao.entity;
 import com.couchbase.client.java.repository.annotation.Field;
 import lombok.*;
 import org.springframework.data.couchbase.core.mapping.Document;
+import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-@EqualsAndHashCode
-@ToString
+@Data
+@NoArgsConstructor
 @Table(name = "seller")
 @Document
 public class SellerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @com.couchbase.client.java.repository.annotation.Id
+    @org.springframework.data.couchbase.core.mapping.id.GeneratedValue
     private Long id;
 
     @Field

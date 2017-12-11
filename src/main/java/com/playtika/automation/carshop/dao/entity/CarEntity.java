@@ -1,26 +1,30 @@
 package com.playtika.automation.carshop.dao.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.*;
 import org.springframework.data.couchbase.core.mapping.Document;
+import org.springframework.data.couchbase.core.mapping.id.*;
 
 import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Transient;
+import java.util.UUID;
 
-@Getter
-@Setter
-@EqualsAndHashCode
+@Data
 @NoArgsConstructor
 @Entity
 @Document
 @Table(name = "car")
 public class CarEntity {
-    @com.couchbase.client.java.repository.annotation.Id
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @com.couchbase.client.java.repository.annotation.Id
+    @org.springframework.data.couchbase.core.mapping.id.GeneratedValue
     private Long id;
+
     @Field
     private String number;
     @Field
@@ -36,4 +40,5 @@ public class CarEntity {
         this.year = year;
         this.color = color;
     }
+
 }

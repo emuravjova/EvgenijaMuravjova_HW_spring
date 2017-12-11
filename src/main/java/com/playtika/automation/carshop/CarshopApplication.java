@@ -1,17 +1,16 @@
 package com.playtika.automation.carshop;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.websocket.WebSocketAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration;
 import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepositories;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+@EnableJpaRepositories({"com.playtika.automation.carshop.dao.jpa", "com.playtika.automation.carshop.dao.entity"})
+@EnableCouchbaseRepositories({"com.playtika.automation.carshop.dao.couchbase", "com.playtika.automation.carshop.dao.entity"})
 @SpringBootApplication(exclude={WebSocketAutoConfiguration.class})
 public class CarshopApplication {
 
