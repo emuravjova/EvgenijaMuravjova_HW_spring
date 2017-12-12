@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository;
 /**
  * Created by emuravjova on 12/11/2017.
  */
-@Repository("jpaOfferDao")
 public interface JpaOfferDao extends OfferDao {
 }

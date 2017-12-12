@@ -1,10 +1,11 @@
-package com.playtika.automation.carshop.dao;
+package com.playtika.automation.carshop.dao.jpa;
 
 import com.github.database.rider.core.DBUnitRule;
 import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import com.playtika.automation.carshop.dao.entity.CarEntity;
+import com.playtika.automation.carshop.dao.jpa.JpaCarDao;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,7 +29,7 @@ import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class CarDaoTest {
+public class JpaCarDaoTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -37,12 +38,12 @@ public class CarDaoTest {
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
 
     @Autowired
-    private CarDao carDao;
+    private JpaCarDao jpaCarDao;
 
     @Test
     @DataSet(value = "car-table.xml", disableConstraints = true)
     public void shouldFindCarByNumber(){
-        Optional<CarEntity> actualFoundCar = carDao.findFirstByNumber("AS123");
+        Optional<CarEntity> actualFoundCar = jpaCarDao.findFirstByNumber("AS123");
         CarEntity expectedCar = new CarEntity("AS123","BMW", 2007, "blue");
         expectedCar.setId(1L);
         assertThat(actualFoundCar.get(), equalTo(expectedCar));
@@ -51,7 +52,7 @@ public class CarDaoTest {
     @Test
     @DataSet(value = "car-table.xml", disableConstraints = true)
     public void shouldReturnEmptyResultIfNoCarFound(){
-        assertThat(carDao.findFirstByNumber("ADD123"), isEmpty());
+        assertThat(jpaCarDao.findFirstByNumber("ADD123"), isEmpty());
     }
 
     @Test
@@ -59,7 +60,7 @@ public class CarDaoTest {
     @ExpectedDataSet("empty-car-table.xml")
     @Commit
     public void shouldDeleteCarById(){
-        int countOfDeletedCar = carDao.deleteById(1L);
+        int countOfDeletedCar = jpaCarDao.deleteById(1L);
         assertThat(countOfDeletedCar, is(1));
     }
 }

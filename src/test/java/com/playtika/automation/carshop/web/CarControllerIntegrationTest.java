@@ -1,5 +1,9 @@
 package com.playtika.automation.carshop.web;
 
+import com.playtika.automation.carshop.CarshopApplication;
+import com.playtika.automation.carshop.dao.CarDao;
+import com.playtika.automation.carshop.dao.OfferDao;
+import com.playtika.automation.carshop.dao.SellerDao;
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.domain.SaleInfo;
@@ -7,8 +11,13 @@ import com.playtika.automation.carshop.service.CarService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.websocket.WebSocketAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;

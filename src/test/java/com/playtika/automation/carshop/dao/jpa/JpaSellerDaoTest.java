@@ -1,7 +1,8 @@
-package com.playtika.automation.carshop.dao;
+package com.playtika.automation.carshop.dao.jpa;
 
 import com.github.database.rider.core.DBUnitRule;
 import com.github.database.rider.core.api.dataset.DataSet;
+import com.playtika.automation.carshop.dao.SellerDao;
 import com.playtika.automation.carshop.dao.entity.CarEntity;
 import com.playtika.automation.carshop.dao.entity.SellerEntity;
 import org.junit.Rule;
@@ -25,7 +26,7 @@ import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class SellerDaoTest {
+public class JpaSellerDaoTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -33,12 +34,12 @@ public class SellerDaoTest {
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
 
     @Autowired
-    private SellerDao sellerDao;
+    private JpaSellerDao jpaSellerDao;
 
     @Test
     @DataSet(value = "seller-table.xml", disableConstraints = true)
     public void shouldFindSellerByContact(){
-        Optional<SellerEntity> actualFoundSeller = sellerDao.findFirstByContacts("0969258649");
+        Optional<SellerEntity> actualFoundSeller = jpaSellerDao.findFirstByContacts("0969258649");
         SellerEntity expectedSeller = new SellerEntity("Sam", "0969258649");
         expectedSeller.setId(1L);
         assertThat(actualFoundSeller.get(), equalTo(expectedSeller));
@@ -47,6 +48,6 @@ public class SellerDaoTest {
     @Test
     @DataSet(value = "seller-table.xml", disableConstraints = true)
     public void shouldReturnEmptyResultIfNoSellerFound(){
-        assertThat(sellerDao.findFirstByContacts("0961111111"), isEmpty());
+        assertThat(jpaSellerDao.findFirstByContacts("0961111111"), isEmpty());
     }
 }

@@ -9,10 +9,7 @@ import com.playtika.automation.carshop.dao.entity.SellerEntity;
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.domain.SaleInfo;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +29,8 @@ public class CarServiceImpl implements CarService {
     private final CarDao carRepo;
     private final SellerDao sellerRepo;
 
-//    public CarServiceImpl(@Qualifier("jpaOfferDao") OfferDao offerRepo, @Qualifier("jpaCarDao") CarDao carRepo, @Qualifier("jpaSellerDao") SellerDao sellerRepo){
-    public CarServiceImpl(@Qualifier("couchbaseOfferDao") OfferDao offerRepo, @Qualifier("couchbaseCarDao") CarDao carRepo, @Qualifier("couchbaseSellerDao") SellerDao sellerRepo){
+    public CarServiceImpl(@Qualifier("jpaOfferDao") OfferDao offerRepo, @Qualifier("jpaCarDao") CarDao carRepo, @Qualifier("jpaSellerDao") SellerDao sellerRepo){
+//    public CarServiceImpl(@Qualifier("couchbaseOfferDao") OfferDao offerRepo, @Qualifier("couchbaseCarDao") CarDao carRepo, @Qualifier("couchbaseSellerDao") SellerDao sellerRepo){
         this.offerRepo = offerRepo;
         this.carRepo = carRepo;
         this.sellerRepo = sellerRepo;

@@ -1,12 +1,14 @@
-package com.playtika.automation.carshop.dao;
+package com.playtika.automation.carshop.dao.jpa;
 
 import com.github.database.rider.core.DBUnitRule;
 import com.github.database.rider.core.api.dataset.DataSet;
+import com.playtika.automation.carshop.dao.OfferDao;
 import com.playtika.automation.carshop.dao.entity.OfferEntity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -24,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class OfferDaoTest {
+public class JpaOfferDaoTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -33,12 +35,12 @@ public class OfferDaoTest {
     public DBUnitRule dbUnitRule = DBUnitRule.instance(() -> jdbcTemplate.getDataSource().getConnection());
 
     @Autowired
-    private OfferDao offerDao;
+    private JpaOfferDao jpaOfferDao;
 
     @Test
     @DataSet("offers-table.xml")
     public void shouldFindOffersWithOutDeal(){
-        List<OfferEntity> offers = offerDao.findByDealIsNull();
+        List<OfferEntity> offers = jpaOfferDao.findByDealIsNull();
         assertThat(offers.get(0).getId(), is(equalTo(1L)));
         assertThat(offers.size(), is(1));
     }
@@ -46,18 +48,18 @@ public class OfferDaoTest {
     @Test
     @DataSet("offers-with-deals-table.xml")
     public void shouldReturnEmptyResultIfOffersWithOutDealNotFound(){
-        assertTrue(offerDao.findByDealIsNull().isEmpty());
+        assertTrue(jpaOfferDao.findByDealIsNull().isEmpty());
     }
 
     @Test
     @DataSet("offers-table.xml")
     public void shouldFindOfferWithOutDealByCarId() {
-        assertThat(offerDao.findByCarIdAndDealIsNull(1L).get(0).getId(), is(equalTo(1L)));
+        assertThat(jpaOfferDao.findByCarIdAndDealIsNull(1L).get(0).getId(), is(equalTo(1L)));
     }
 
     @Test
     @DataSet("offers-table.xml")
     public void shouldReturnEmptyResultIfOfferWithOutDealByCarIdNotFound() {
-        assertTrue(offerDao.findByCarIdAndDealIsNull(2L).isEmpty());
+        assertTrue(jpaOfferDao.findByCarIdAndDealIsNull(2L).isEmpty());
     }
 }

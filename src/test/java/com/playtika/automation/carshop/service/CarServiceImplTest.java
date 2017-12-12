@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.*;
 
@@ -30,10 +31,13 @@ public class CarServiceImplTest {
     private CarService carService;
 
     @Mock
+    @Qualifier("jpaOfferDao")
     private OfferDao offerRepo;
     @Mock
+    @Qualifier("jpaCarDao")
     private CarDao carRepo;
     @Mock
+    @Qualifier("jpaSellerDao")
     private SellerDao sellerRepo;
 
     @Before
