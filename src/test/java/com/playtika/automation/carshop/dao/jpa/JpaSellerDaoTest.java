@@ -2,6 +2,7 @@ package com.playtika.automation.carshop.dao.jpa;
 
 import com.github.database.rider.core.DBUnitRule;
 import com.github.database.rider.core.api.dataset.DataSet;
+import com.playtika.automation.carshop.context.JpaRepositoryContext;
 import com.playtika.automation.carshop.dao.SellerDao;
 import com.playtika.automation.carshop.dao.entity.CarEntity;
 import com.playtika.automation.carshop.dao.entity.SellerEntity;
@@ -11,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
@@ -25,6 +27,7 @@ import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
  */
 
 @RunWith(SpringRunner.class)
+@ContextConfiguration(classes = JpaRepositoryContext.class)
 @DataJpaTest
 public class JpaSellerDaoTest {
     @Autowired

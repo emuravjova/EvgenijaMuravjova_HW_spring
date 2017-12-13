@@ -1,12 +1,10 @@
 package com.playtika.automation.carshop.dao.jpa;
 
 import com.github.database.rider.core.DBUnitRule;
-import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.core.api.dataset.ExpectedDataSet;
+import com.playtika.automation.carshop.context.JpaRepositoryContext;
 import com.playtika.automation.carshop.dao.entity.CarEntity;
-import com.playtika.automation.carshop.dao.jpa.JpaCarDao;
-import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,20 +12,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Commit;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
+import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
-import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
 
 /**
  * Created by emuravjova on 12/8/2017.
  */
 @RunWith(SpringRunner.class)
+@ContextConfiguration(classes = JpaRepositoryContext.class)
 @DataJpaTest
 public class JpaCarDaoTest {
 

@@ -2,6 +2,7 @@ package com.playtika.automation.carshop.dao.jpa;
 
 import com.github.database.rider.core.DBUnitRule;
 import com.github.database.rider.core.api.dataset.DataSet;
+import com.playtika.automation.carshop.context.JpaRepositoryContext;
 import com.playtika.automation.carshop.dao.OfferDao;
 import com.playtika.automation.carshop.dao.entity.OfferEntity;
 import org.junit.Rule;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -25,6 +27,7 @@ import static org.junit.Assert.assertTrue;
  */
 
 @RunWith(SpringRunner.class)
+@ContextConfiguration(classes = JpaRepositoryContext.class)
 @DataJpaTest
 public class JpaOfferDaoTest {
 
