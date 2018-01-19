@@ -1,27 +1,39 @@
 package com.playtika.automation.carshop.dao.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Check;
+import lombok.Setter;
 import org.springframework.data.couchbase.core.mapping.Document;
-import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Getter
-@NoArgsConstructor
+@Setter
 @Entity
+@EqualsAndHashCode
 @Table(name = "deal")
 @Document
+@NoArgsConstructor
 public class DealEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @com.couchbase.client.java.repository.annotation.Id
     @org.springframework.data.couchbase.core.mapping.id.GeneratedValue
     private Long id;
+
+    @ManyToOne
+    @JoinColumn (name = "customer_id")
+    @Field
+    private CustomerEntity customer;
 
     @ManyToOne
     @JoinColumn(name = "sale_id")
@@ -31,15 +43,18 @@ public class DealEntity {
     @Field
     private int price;
 
-    @Column(columnDefinition = "ENUM('ACTIVE', 'REJECTED', 'ACCEPTED')", nullable = false)
+    @Column(columnDefinition = "ENUM('ACTIVE', 'REJECTED', 'ACCEPTED')")
     @Field
     private State state;
 
-    @Column(name = "actual_date", columnDefinition = "DATE DEFAULT CURRENT_DATE")
-    @Field
-    private java.sql.Date startDate;
-
-    private enum State {
+    public enum State {
         ACTIVE, REJECTED, ACCEPTED
+    }
+
+    public DealEntity(CustomerEntity customer, OfferEntity offer, int price, State state) {
+        this.customer = customer;
+        this.offer = offer;
+        this.price = price;
+        this.state = state;
     }
 }

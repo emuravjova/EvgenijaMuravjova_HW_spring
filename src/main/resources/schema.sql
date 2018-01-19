@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS car;
 DROP TABLE IF EXISTS seller;
+DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS offer;
 DROP TABLE IF EXISTS deal;
 
@@ -14,7 +15,13 @@ CREATE TABLE IF NOT EXISTS car (
 CREATE TABLE IF NOT EXISTS seller (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(20) NOT NULL,
-  contacts  VARCHAR(70) NOT NULL
+  contacts  VARCHAR(70) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS customer (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(20) NOT NULL,
+  contacts  VARCHAR(70) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS offer (
@@ -22,17 +29,18 @@ CREATE TABLE IF NOT EXISTS offer (
   car_id BIGINT NOT NULL,
   seller_id  BIGINT NOT NULL,
   price INTEGER check (price > 0),
-  deal_id BIGINT,
+  accepted_deal_id BIGINT,
 FOREIGN KEY (car_id) REFERENCES car(id) ON DELETE CASCADE,
-FOREIGN KEY (seller_id) REFERENCES seller(id) ON DELETE CASCADE,
-UNIQUE (car_id, deal_id)
+FOREIGN KEY (seller_id) REFERENCES seller(id),
+UNIQUE (car_id, accepted_deal_id)
 );
 
 CREATE TABLE IF NOT EXISTS deal (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  customer_id  BIGINT NOT NULL,
   sale_id BIGINT NOT NULL,
   price INTEGER check (price > 0),
   state ENUM('active', 'rejected', 'accepted'),
-  actual_date date NOT NULL DEFAULT GETDATE(),
-FOREIGN KEY (sale_id) REFERENCES offer(id)
+FOREIGN KEY (customer_id) REFERENCES customer(id),
+FOREIGN KEY (sale_id) REFERENCES offer(id) ON DELETE CASCADE,
 );

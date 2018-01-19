@@ -9,10 +9,12 @@ import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 import javax.persistence.*;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 @Table(name = "offer")
 @Document
 public class OfferEntity {
@@ -34,10 +36,14 @@ public class OfferEntity {
 
     private int price;
 
-    @OneToMany(mappedBy = "offer")
-    @Column(name = "deal_id")
+    @OneToOne
     @Field
-    private List<DealEntity> deal;
+    private DealEntity acceptedDeal;
+
+    @OneToMany(mappedBy = "offer")
+//    @Column(name = "deal_id")
+    @Field
+    private List<DealEntity> deals;
 
     public OfferEntity(CarEntity car, SellerEntity seller, int price) {
         this.car = car;

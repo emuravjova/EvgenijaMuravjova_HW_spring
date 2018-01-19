@@ -22,9 +22,11 @@ public class SwaggerConfig {
                 .globalResponseMessage(RequestMethod.GET, ImmutableList.of(new ResponseMessage(200, "OK",null, null, null)))
                 .globalResponseMessage(RequestMethod.POST, ImmutableList.of(new ResponseMessage(200, "OK",null, null, null)))
                 .globalResponseMessage(RequestMethod.DELETE, ImmutableList.of(new ResponseMessage(200, "OK",null, null, null)))
+                .globalResponseMessage(RequestMethod.PUT, ImmutableList.of(new ResponseMessage(200, "OK",null, null, null)))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.playtika.automation.carshop.web"))
-                .paths(regex("/cars.*"))
+//                .paths(regex("/cars.*"))
+//                .paths(regex("/deal.*"))
                 .build()
                 .apiInfo(metaData());
     }

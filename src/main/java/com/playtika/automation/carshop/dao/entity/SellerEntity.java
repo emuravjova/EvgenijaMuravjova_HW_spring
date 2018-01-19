@@ -8,8 +8,10 @@ import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 import javax.persistence.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 @Table(name = "seller")
 @Document
 public class SellerEntity {

@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by emuravjova on 12/6/2017.
@@ -13,7 +14,9 @@ import java.util.List;
 
 @NoRepositoryBean
 public interface OfferDao extends CrudRepository<OfferEntity, Long> {
-    List<OfferEntity> findByDealIsNull();
-    List<OfferEntity> findByCarIdAndDealIsNull(Long id);
+    List<OfferEntity> findByAcceptedDealIsNull();
+    List<OfferEntity> findByCarIdAndAcceptedDealIsNull(Long id);
+    Optional<OfferEntity> findByIdAndAcceptedDealIsNull(Long id);
+    Optional<OfferEntity> findByDealsIdAndAcceptedDealIsNull(Long id);
 }
 

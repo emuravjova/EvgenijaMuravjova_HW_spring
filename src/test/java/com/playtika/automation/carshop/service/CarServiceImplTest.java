@@ -1,6 +1,8 @@
 package com.playtika.automation.carshop.service;
 
 import com.playtika.automation.carshop.dao.CarDao;
+import com.playtika.automation.carshop.dao.CustomerDao;
+import com.playtika.automation.carshop.dao.DealDao;
 import com.playtika.automation.carshop.dao.OfferDao;
 import com.playtika.automation.carshop.dao.SellerDao;
 import com.playtika.automation.carshop.dao.entity.CarEntity;
@@ -39,10 +41,16 @@ public class CarServiceImplTest {
     @Mock
     @Qualifier("jpaSellerDao")
     private SellerDao sellerRepo;
+    @Mock
+    @Qualifier("jpaCustomerDao")
+    private CustomerDao CustomerRepo;
+    @Mock
+    @Qualifier("jpaDealDao")
+    private DealDao DealRepo;
 
     @Before
     public void init() {
-        carService = new CarServiceImpl(offerRepo, carRepo, sellerRepo);
+        carService = new CarServiceImpl(offerRepo, carRepo, sellerRepo, CustomerRepo, DealRepo);
     }
 
     @Test
@@ -58,7 +66,7 @@ public class CarServiceImplTest {
         addOfferEntities(expectedOffers, 1L, car, seller, 12000);
         CarSaleDetails availableCarToSale = getCarSaleDetails(car, seller, 12000);
 
-        when(offerRepo.findByDealIsNull()).thenReturn(expectedOffers);
+        when(offerRepo.findByAcceptedDealIsNull()).thenReturn(expectedOffers);
         Collection<CarSaleDetails> availableCars = carService.getAllCars();
 
         assertThat(availableCars, hasItem(availableCarToSale));
@@ -73,7 +81,7 @@ public class CarServiceImplTest {
         addOfferEntities(expectedOffers, 2L, car, seller, 12000);
         CarSaleDetails availableCarToSale = getCarSaleDetails(car, seller, 12000);
 
-        when(offerRepo.findByCarIdAndDealIsNull(1L)).thenReturn(expectedOffers);
+        when(offerRepo.findByCarIdAndAcceptedDealIsNull(1L)).thenReturn(expectedOffers);
 
         assertThat(carService.getCarDetailsById(1L), equalTo(java.util.Optional.of(availableCarToSale)));
     }
@@ -105,7 +113,7 @@ public class CarServiceImplTest {
 
         when(carRepo.findFirstByNumber(carBeforeStore.getNumber())).thenReturn(Optional.empty());
         when(sellerRepo.findFirstByContacts(seller.getContacts())).thenReturn(Optional.empty());
-        when(offerRepo.findByCarIdAndDealIsNull(carAfterStore.getId())).thenReturn(Collections.EMPTY_LIST);
+        when(offerRepo.findByCarIdAndAcceptedDealIsNull(carAfterStore.getId())).thenReturn(Collections.EMPTY_LIST);
         when(carRepo.save(carBeforeStore)).thenReturn(carAfterStore);
         when(sellerRepo.save(seller)).thenReturn(seller);
         when(offerRepo.save(offer)).thenReturn(offer);
@@ -129,7 +137,7 @@ public class CarServiceImplTest {
 
         when(carRepo.findFirstByNumber(carBeforeStore.getNumber())).thenReturn(Optional.empty());
         when(sellerRepo.findFirstByContacts(seller.getContacts())).thenReturn(Optional.of(seller));
-        when(offerRepo.findByCarIdAndDealIsNull(carAfterStore.getId())).thenReturn(Collections.EMPTY_LIST);
+        when(offerRepo.findByCarIdAndAcceptedDealIsNull(carAfterStore.getId())).thenReturn(Collections.EMPTY_LIST);
         when(carRepo.save(carBeforeStore)).thenReturn(carAfterStore);
         when(offerRepo.save(offer)).thenReturn(offer);
 
@@ -151,7 +159,7 @@ public class CarServiceImplTest {
 
         when(carRepo.findFirstByNumber(carAfterStore.getNumber())).thenReturn(Optional.of(carAfterStore));
         when(sellerRepo.findFirstByContacts(seller.getContacts())).thenReturn(Optional.of(seller));
-        when(offerRepo.findByCarIdAndDealIsNull(carAfterStore.getId())).thenReturn(Collections.EMPTY_LIST);
+        when(offerRepo.findByCarIdAndAcceptedDealIsNull(carAfterStore.getId())).thenReturn(Collections.EMPTY_LIST);
         when(offerRepo.save(offer)).thenReturn(offer);
 
         long id = carService.addCar(carToStore);
@@ -174,7 +182,7 @@ public class CarServiceImplTest {
 
         when(carRepo.findFirstByNumber(carAfterStore.getNumber())).thenReturn(Optional.of(carAfterStore));
         when(sellerRepo.findFirstByContacts(seller.getContacts())).thenReturn(Optional.of(seller));
-        when(offerRepo.findByCarIdAndDealIsNull(carAfterStore.getId())).thenReturn(offers);
+        when(offerRepo.findByCarIdAndAcceptedDealIsNull(carAfterStore.getId())).thenReturn(offers);
 
         carService.addCar(carToStore);
 
