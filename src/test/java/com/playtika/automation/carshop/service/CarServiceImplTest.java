@@ -5,15 +5,15 @@ import com.playtika.automation.carshop.dao.CustomerDao;
 import com.playtika.automation.carshop.dao.DealDao;
 import com.playtika.automation.carshop.dao.OfferDao;
 import com.playtika.automation.carshop.dao.SellerDao;
-import com.playtika.automation.carshop.dao.entity.CarEntity;
-import com.playtika.automation.carshop.dao.entity.OfferEntity;
-import com.playtika.automation.carshop.dao.entity.SellerEntity;
+import com.playtika.automation.carshop.dao.entity.*;
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
+import com.playtika.automation.carshop.domain.Customer;
 import com.playtika.automation.carshop.domain.SaleInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,14 +43,14 @@ public class CarServiceImplTest {
     private SellerDao sellerRepo;
     @Mock
     @Qualifier("jpaCustomerDao")
-    private CustomerDao CustomerRepo;
+    private CustomerDao customerRepo;
     @Mock
     @Qualifier("jpaDealDao")
-    private DealDao DealRepo;
+    private DealDao dealRepo;
 
     @Before
     public void init() {
-        carService = new CarServiceImpl(offerRepo, carRepo, sellerRepo, CustomerRepo, DealRepo);
+        carService = new CarServiceImpl(offerRepo, carRepo, sellerRepo, customerRepo, dealRepo);
     }
 
     @Test
@@ -189,6 +189,180 @@ public class CarServiceImplTest {
         verify(carRepo, never()).save(carBeforeStore);
         verify(sellerRepo, never()).save(seller);
         verify(offerRepo, never()).save(offer);
+    }
+
+    @Test
+    public void dealShouldNotBeCreatedForCarThatIsNotOnSale(){
+        when(offerRepo.findByCarIdAndAcceptedDealIsNull(1L)).thenReturn(Collections.EMPTY_LIST);
+
+        carService.createDeal(1L, 100500, new Customer("Den","0969876543"));
+
+        verify(customerRepo, never()).findFirstByContacts("0969876543");
+        verify(customerRepo, never()).save(new CustomerEntity("Den","0969876543"));
+        verify(dealRepo, never()).save(Matchers.isA(DealEntity.class));
+    }
+
+    @Test
+    public void dealShouldBeCreatedWhenCustomerIsPresent(){
+        OfferEntity offer = createOffer();
+        List<OfferEntity> offers = new ArrayList<>();
+        offers.add(offer);
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity dealToStore = new DealEntity(customer, offer, 100500, DealEntity.State.ACTIVE);
+        DealEntity newDeal = new DealEntity(1L, customer, offer, 100500, DealEntity.State.ACTIVE);
+
+        when(offerRepo.findByCarIdAndAcceptedDealIsNull(offer.getCar().getId())).thenReturn(offers);
+        when(customerRepo.findFirstByContacts(customer.getContacts())).thenReturn(Optional.of(customer));
+        when(dealRepo.save(dealToStore)).thenReturn(newDeal);
+
+        Optional<DealEntity> actualDeal = carService.createDeal(1L, 100500, new Customer("Den","0969876543"));
+
+        assertThat(actualDeal.get().getId(), greaterThan(0L));
+        verify(dealRepo, times(1)).save(dealToStore);
+        verify(customerRepo, times(1)).findFirstByContacts("0969876543");
+        verify(customerRepo, never()).save(new CustomerEntity("Den","0969876543"));
+    }
+
+    @Test
+    public void dealShouldBeCreatedWhenCustomerIsAbsent(){
+        OfferEntity offer = createOffer();
+        List<OfferEntity> offers = new ArrayList<>();
+        offers.add(offer);
+        CustomerEntity customerToStore = new CustomerEntity("Den","0969876543");
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity dealToStore = new DealEntity(customer, offer, 100500, DealEntity.State.ACTIVE);
+        DealEntity newDeal = new DealEntity(1L, customer, offer, 100500, DealEntity.State.ACTIVE);
+
+        when(offerRepo.findByCarIdAndAcceptedDealIsNull(offer.getCar().getId())).thenReturn(offers);
+        when(customerRepo.findFirstByContacts(customerToStore.getContacts())).thenReturn(Optional.empty());
+        when(customerRepo.save(customerToStore)).thenReturn(customer);
+        when(dealRepo.save(dealToStore)).thenReturn(newDeal);
+
+        Optional<DealEntity> actualDeal = carService.createDeal(1L, 100500, new Customer("Den","0969876543"));
+
+        assertThat(actualDeal.get().getId(), greaterThan(0L));
+        verify(dealRepo, times(1)).save(dealToStore);
+        verify(customerRepo, times(1)).findFirstByContacts("0969876543");
+        verify(customerRepo, times(1)).save(new CustomerEntity("Den","0969876543"));
+    }
+
+    @Test
+    public void bestDealShouldBeReturnedForOpenOffer(){
+        OfferEntity offer = createOffer();
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity deal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.ACTIVE);
+        DealEntity bestDeal = new DealEntity(2L, customer, offer, 30000, DealEntity.State.ACTIVE);
+        List<DealEntity> deals = new ArrayList<>();
+        deals.add(deal);
+        deals.add(bestDeal);
+
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.of(offer));
+        when(dealRepo.findByOfferId(offer.getId())).thenReturn(deals);
+
+        assertThat(carService.findTheBestDeal(1L).get().getPrice(), equalTo(30000));
+    }
+
+    @Test
+    public void bestDealShouldBeCalculatedAmongActiveDeals(){
+        OfferEntity offer = createOffer();
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity activeDeal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.ACTIVE);
+        DealEntity rejectedDeal = new DealEntity(2L, customer, offer, 30000, DealEntity.State.REJECTED);
+        List<DealEntity> deals = new ArrayList<>();
+        deals.add(activeDeal);
+        deals.add(rejectedDeal);
+
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.of(offer));
+        when(dealRepo.findByOfferId(offer.getId())).thenReturn(deals);
+
+        assertThat(carService.findTheBestDeal(1L).get().getPrice(), equalTo(20000));
+    }
+
+    @Test
+    public void bestDealShouldNotBeCalculatedForClosedOffer(){
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.empty());
+        assertTrue(!carService.findTheBestDeal(1L).isPresent());
+    }
+
+    @Test
+    public void bestDealShouldNotBeReturnedWhenNoDealsAtAllForOpenOffer(){
+        OfferEntity offer = createOffer();
+
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.of(offer));
+        assertTrue(!carService.findTheBestDeal(1L).isPresent());
+    }
+
+    @Test
+    public void bestDealShouldNotBeReturnedWhenNoActiveDealsForOpenOffer(){
+        OfferEntity offer = createOffer();
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity deal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.REJECTED);
+
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.of(offer));
+        assertTrue(!carService.findTheBestDeal(1L).isPresent());
+    }
+
+    @Test
+    public void dealShouldBeRejectedForOpenOffer(){
+        OfferEntity offer = createOffer();
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity deal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.ACTIVE);
+        DealEntity rejectedDeal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.REJECTED);
+
+        when(dealRepo.findOne(1L)).thenReturn(deal);
+        when(dealRepo.save(rejectedDeal)).thenReturn(rejectedDeal);
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.of(offer));
+        carService.rejectDeal(1L);
+        assertFalse(carService.findTheBestDeal(1L).isPresent());
+    }
+
+    @Test
+    public void dealShouldBeAcceptedForOpenOffer(){
+        OfferEntity offer = createOffer();
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity deal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.ACTIVE);
+        DealEntity acceptedDeal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.ACCEPTED);
+
+        when(dealRepo.findOne(1L)).thenReturn(deal);
+        when(dealRepo.save(acceptedDeal)).thenReturn(acceptedDeal);
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.of(offer));
+
+        assertTrue(carService.acceptDeal(1L));
+        assertThat(offer.getAcceptedDeal().getState(), equalTo(DealEntity.State.ACCEPTED));
+    }
+
+    @Test
+    public void dealShouldNotBeAcceptedForClosedOffer(){
+        OfferEntity offer = createOffer();
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity deal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.ACCEPTED);
+
+        when(dealRepo.findOne(1L)).thenReturn(deal);
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.empty());
+
+        assertFalse(carService.acceptDeal(1L));
+    }
+
+    @Test
+    public void offerShouldBeClosedWhenDealIsAccepted(){
+        OfferEntity offer = createOffer();
+        CustomerEntity customer = new CustomerEntity(1L,"Den","0969876543");
+        DealEntity deal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.ACTIVE);
+        DealEntity acceptedDeal = new DealEntity(1L, customer, offer, 20000, DealEntity.State.ACCEPTED);
+
+        when(dealRepo.findOne(1L)).thenReturn(deal);
+        when(dealRepo.save(acceptedDeal)).thenReturn(acceptedDeal);
+        when(offerRepo.findByIdAndAcceptedDealIsNull(1L)).thenReturn(Optional.of(offer));
+
+        assertTrue(carService.acceptDeal(1L));
+        assertThat(offer.getAcceptedDeal().getId(), equalTo(acceptedDeal.getId()));
+    }
+
+
+    private OfferEntity createOffer(){
+        CarEntity car = getCarEntity(1L, "AS123", "BMW", 2007, "blue");
+        SellerEntity seller = new SellerEntity("John doe", "0501234567");
+        return getOfferEntity(1L, car, seller, 12000);
     }
 
     private List<OfferEntity> addOfferEntities(List<OfferEntity> expectedOffers, long id, CarEntity car, SellerEntity seller, int price) {

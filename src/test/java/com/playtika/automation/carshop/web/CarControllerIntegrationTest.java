@@ -1,7 +1,9 @@
 package com.playtika.automation.carshop.web;
 
+import com.playtika.automation.carshop.dao.entity.*;
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
+import com.playtika.automation.carshop.domain.Customer;
 import com.playtika.automation.carshop.domain.SaleInfo;
 import com.playtika.automation.carshop.service.CarService;
 import org.junit.Test;
@@ -14,9 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Collections.emptySet;
 import static org.mockito.Mockito.*;
@@ -144,6 +144,99 @@ public class CarControllerIntegrationTest {
         verify(carService, never()).addCar(any());
     }
 
+
+    @Test
+    public void shouldReturn400whenCarIdPriceAreAbsentOnCreateDeal() throws Exception {
+        postDeal(null,null,createCustomerInJson("Den","1111"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturn400whenPriceAreEmptyOnCreateDeal() throws Exception {
+        postDeal("","",createCustomerInJson("Den","1111"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturn400whenCustomerIsEmptyOnCreateDeal() throws Exception {
+        postDeal(String.valueOf(20000),String.valueOf(1L),createCustomerInJson("",""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturn400whenNoCustomerProvidedOnCreateDeal() throws Exception {
+        mockMvc.perform(post("/deal")
+                .param("price", String.valueOf(20000))
+                .param("id", String.valueOf(1L))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturn200whenDealWasCreated() throws Exception {
+        DealEntity deal = createDeal();
+        Customer customer = new Customer(deal.getCustomer().getName(),deal.getCustomer().getContacts());
+        Long carId = deal.getOffer().getCar().getId();
+        when(carService.createDeal(carId, deal.getPrice(), customer))
+                .thenReturn(Optional.of(deal));
+        postDeal(String.valueOf(deal.getPrice()), String.valueOf(carId),createCustomerInJson(customer.getName(),customer.getContacts()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.offerId").value(1L));
+    }
+
+    @Test
+    public void shouldReturn404whenCarIsNotOnSale() throws Exception {
+        Customer customer = new Customer("Den","1111");
+        when(carService.createDeal(1L, 1000, customer))
+                .thenReturn(Optional.empty());
+        postDeal(String.valueOf(1000), String.valueOf(1L),createCustomerInJson(customer.getName(),customer.getContacts()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturn200whenBestDealIsFound() throws Exception {
+        DealEntity deal = createDeal();
+        when(carService.findTheBestDeal(deal.getOffer().getId()))
+                .thenReturn(Optional.of(deal));
+        mockMvc.perform(get("/offer/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.offerId").value(1L));
+    }
+
+    @Test
+    public void shouldReturn404whenBestDealNotFound() throws Exception {
+        when(carService.findTheBestDeal(1L))
+                .thenReturn(Optional.empty());
+        mockMvc.perform(get("/offer/1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturn200whenDealIsAccepted() throws Exception {
+        when(carService.acceptDeal(1L))
+                .thenReturn(true);
+        mockMvc.perform(put("/acceptDeal/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturn409whenDealCouldNotBeAccepted() throws Exception {
+        when(carService.acceptDeal(1L))
+                .thenReturn(false);
+        mockMvc.perform(put("/acceptDeal/1"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void shouldReturn200whenDealIsRejected() throws Exception {
+        mockMvc.perform(put("/rejectDeal/1"))
+                .andExpect(status().isOk());
+    }
+
     private static String createCarInJson(String number, String brand, Integer year, String color) {
         return String.format("{ \"number\": \"%s\", \"brand\":\"%s\", \"year\": %s, \"color\":\"%s\"}", number, brand, year, color);
 
@@ -161,6 +254,29 @@ public class CarControllerIntegrationTest {
         return mockMvc.perform(post("/cars")
                 .param("price", price)
                 .param("contacts", contacts)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(body));
+    }
+
+    private static DealEntity createDeal(){
+        CarEntity car = new CarEntity(1L, "AS123", "BMW", 2007, "blue");
+        SellerEntity seller = new SellerEntity(1L,"John doe", "0501234567");
+        OfferEntity offer = new OfferEntity(car, seller, 20000);
+        offer.setId(1L);
+        CustomerEntity customer = new CustomerEntity(1L,"Den","1111");
+        DealEntity deal = new DealEntity(1L, customer, offer, 25000, DealEntity.State.ACTIVE);
+        return deal;
+    }
+
+    private static String createCustomerInJson(String name, String contacts) {
+        return String.format("{ \"name\": \"%s\", \"contacts\":\"%s\"}", name, contacts);
+
+    }
+
+    private ResultActions postDeal(String price, String id, String body) throws Exception {
+        return mockMvc.perform(post("/deal")
+                .param("price", price)
+                .param("carId", id)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(body));
     }

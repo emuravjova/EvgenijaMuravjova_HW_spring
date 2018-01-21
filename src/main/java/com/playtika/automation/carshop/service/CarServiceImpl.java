@@ -101,10 +101,10 @@ public class CarServiceImpl implements CarService {
         if (offerIsAbsent) {
             return Optional.empty();
         }
-        Optional<CustomerEntity> storedCustomer = findCustomerByContact(customer.getContacts());
-        CustomerEntity carCustomer = storedCustomer.orElseGet(() -> persistCustomer(customer));
-        log.info("New deal for car {} has been added", openOffer.get().getCar());
-        return Optional.of(persistDeal(openOffer.get(), price, carCustomer));
+        CustomerEntity carCustomer = getCustomerForDeal(customer);
+        DealEntity newDeal = persistDeal(openOffer.get(), price, carCustomer);
+        log.info("New deal with id {} for car {} has been added", newDeal.getId(), openOffer.get().getCar());
+        return Optional.of(newDeal);
     }
 
     @Override
@@ -112,41 +112,58 @@ public class CarServiceImpl implements CarService {
         Optional<OfferEntity> offer = offerRepo.findByIdAndAcceptedDealIsNull(id);
         boolean offerIsClosed = !offer.isPresent();
         if (offerIsClosed){
+            log.info("Offer is aldeady closed or not exist");
             return Optional.empty();
         }
-        List<DealEntity> deals = offer.get().getDeals();
-        return findDealWithMaxPrice(deals);
+        return findDealWithMaxPrice(offer.get());
     }
 
     @Override
     public boolean acceptDeal(long id) {
-        Optional<OfferEntity> optionalOffer = offerRepo.findByDealsIdAndAcceptedDealIsNull(id);
+        DealEntity deal = dealRepo.findOne(id);
+        Optional<OfferEntity> optionalOffer = offerRepo.findByIdAndAcceptedDealIsNull(deal.getOffer().getId());
         boolean offerIsClosed = !optionalOffer.isPresent();
         if (offerIsClosed){
+            log.info("Offer is already closed");
             return false;
         }
-        DealEntity deal = dealRepo.findOne(id);
-        deal.setState(DealEntity.State.ACCEPTED);
-        dealRepo.save(deal);
-        log.info("Deal with id {} has been accepted", id);
-        OfferEntity offer = optionalOffer.get();
-        offer.setAcceptedDeal(deal);
-        offerRepo.save(offer);
-        log.info("Offer with id {} has been closed", offer.getId());
+        closeOfferWithAcceptedDeal(optionalOffer.get(), changeDealState(id, DealEntity.State.ACCEPTED));
         return true;
     }
 
     @Override
     public void rejectDeal(long id) {
-        DealEntity deal = dealRepo.findOne(id);
-        deal.setState(DealEntity.State.REJECTED);
-        dealRepo.save(deal);
-        log.info("Deal with id {} has been rejected", id);
+        changeDealState(id, DealEntity.State.REJECTED);
     }
 
-    private Optional<DealEntity> findDealWithMaxPrice(List<DealEntity> deals) {
+    private CustomerEntity getCustomerForDeal(Customer customer) {
+        Optional<CustomerEntity> storedCustomer = findCustomerByContact(customer.getContacts());
+        return storedCustomer.orElseGet(() -> persistCustomer(customer));
+    }
+
+    private void closeOfferWithAcceptedDeal(OfferEntity offerToClose, DealEntity acceptedDeal) {
+        offerToClose.setAcceptedDeal(acceptedDeal);
+        offerRepo.save(offerToClose);
+        log.info("Offer with id {} has been closed", offerToClose.getId());
+    }
+
+    private DealEntity changeDealState(long id, DealEntity.State state) {
+        DealEntity deal = dealRepo.findOne(id);
+        deal.setState(state);
+        dealRepo.save(deal);
+        log.info("Deal with id {} has been {}", id, state);
+        return deal;
+    }
+
+    private Optional<DealEntity> findDealWithMaxPrice(OfferEntity offer) {
+        List<DealEntity> deals = dealRepo.findByOfferId(offer.getId());
+        if (deals.isEmpty()){
+            log.info("No deals present for offer with id {}", offer.getId());
+            return Optional.empty();
+        }
         return deals
                 .stream()
+                .filter(deal -> deal.getState() == DealEntity.State.ACTIVE)
                 .max(Comparator.comparingInt(DealEntity::getPrice));
     }
 

@@ -14,6 +14,7 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Document
 @Table(name = "car")

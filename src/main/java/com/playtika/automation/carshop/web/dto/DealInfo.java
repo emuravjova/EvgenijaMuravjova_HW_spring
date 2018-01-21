@@ -9,7 +9,8 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class DealId {
+public class DealInfo {
     @ApiModelProperty(notes = "Deal id", required = true, example = "1")
     private long id;
+    private long offerId;
 }

@@ -17,6 +17,5 @@ public interface OfferDao extends CrudRepository<OfferEntity, Long> {
     List<OfferEntity> findByAcceptedDealIsNull();
     List<OfferEntity> findByCarIdAndAcceptedDealIsNull(Long id);
     Optional<OfferEntity> findByIdAndAcceptedDealIsNull(Long id);
-    Optional<OfferEntity> findByDealsIdAndAcceptedDealIsNull(Long id);
 }
 

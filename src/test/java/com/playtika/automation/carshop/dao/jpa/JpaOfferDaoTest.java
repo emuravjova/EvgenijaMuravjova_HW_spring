@@ -1,6 +1,7 @@
 package com.playtika.automation.carshop.dao.jpa;
 
 import com.github.database.rider.core.DBUnitRule;
+import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.playtika.automation.carshop.context.JpaRepositoryContext;
 import com.playtika.automation.carshop.dao.OfferDao;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -45,36 +47,37 @@ public class JpaOfferDaoTest {
     @Autowired
     private JpaOfferDao jpaOfferDao;
 
-//    @Test
-//    @DataSet("offers-table.xml")
-//    public void shouldFindOffersWithOutDeal() {
-//        List<OfferEntity> offers = jpaOfferDao.findByDealIsNull();
-//        CarEntity car = new CarEntity("AS123", "BMW", 2007, "blue");
-//        car.setId(1L);
-//        SellerEntity seller = new SellerEntity("Den", "0501234567");
-//        seller.setId(1L);
-//        OfferEntity expectedOffers = new OfferEntity(1L, car, seller, 12000, Collections.emptyList());
-//        assertThat(offers.get(0).getCar(), equalTo(expectedOffers.getCar()));
-//        assertThat(offers.get(0).getSeller(), equalTo(expectedOffers.getSeller()));
-//        assertThat(offers.get(0).getDeal(), empty());
-//        assertThat(offers.get(0).getId(), is(1L));
-//        assertThat(offers.size(), is(1));
-//    }
+    @Test
+    @DataSet(value = "offers-table.xml", disableConstraints = true, useSequenceFiltering = false)
+    @DBUnit(allowEmptyFields = true)
+    public void shouldFindOffersWithOutDeal() {
+        List<OfferEntity> offers = jpaOfferDao.findByAcceptedDealIsNull();
+        CarEntity car = new CarEntity("AS123", "BMW", 2007, "blue");
+        car.setId(1L);
+        SellerEntity seller = new SellerEntity("Den", "0501234567");
+        seller.setId(1L);
+        OfferEntity expectedOffers = new OfferEntity(1L, car, seller, 12000, null);
+        assertThat(offers.get(0).getCar(), equalTo(expectedOffers.getCar()));
+        assertThat(offers.get(0).getSeller(), equalTo(expectedOffers.getSeller()));
+        assertThat(offers.get(0).getAcceptedDeal(), nullValue());
+        assertThat(offers.get(0).getId(), is(1L));
+        assertThat(offers.size(), is(1));
+    }
 
     @Test
-    @DataSet("offers-with-deals-table.xml")
+    @DataSet(value = "offers-with-deals-table.xml", disableConstraints = true, useSequenceFiltering = false)
     public void shouldReturnEmptyResultIfOffersWithOutDealNotFound() {
         assertTrue(jpaOfferDao.findByAcceptedDealIsNull().isEmpty());
     }
 
     @Test
-    @DataSet("offers-table.xml")
+    @DataSet(value = "offers-table.xml", disableConstraints = true, useSequenceFiltering = false)
     public void shouldFindOfferWithOutDealByCarId() {
         assertThat(jpaOfferDao.findByCarIdAndAcceptedDealIsNull(1L).get(0).getId(), is(equalTo(1L)));
     }
 
     @Test
-    @DataSet("offers-table.xml")
+    @DataSet(value = "offers-table.xml", disableConstraints = true, useSequenceFiltering = false)
     public void shouldReturnEmptyResultIfOfferWithOutDealByCarIdNotFound() {
         assertTrue(jpaOfferDao.findByCarIdAndAcceptedDealIsNull(2L).isEmpty());
     }

@@ -1,10 +1,7 @@
 package com.playtika.automation.carshop.dao.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.couchbase.core.mapping.Document;
 
 import javax.persistence.Column;
@@ -23,6 +20,7 @@ import javax.persistence.Table;
 @Table(name = "deal")
 @Document
 @NoArgsConstructor
+@AllArgsConstructor
 public class DealEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,7 +34,7 @@ public class DealEntity {
     private CustomerEntity customer;
 
     @ManyToOne
-    @JoinColumn(name = "sale_id")
+    @JoinColumn(name = "offer_id")
     @Field
     private OfferEntity offer;
 

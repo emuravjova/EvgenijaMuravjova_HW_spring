@@ -16,4 +16,5 @@ import java.util.Optional;
  */
 @NoRepositoryBean
 public interface DealDao extends CrudRepository<DealEntity, Long> {
+    List<DealEntity> findByOfferId(Long id);
 }

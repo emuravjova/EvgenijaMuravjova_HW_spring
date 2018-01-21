@@ -40,11 +40,6 @@ public class OfferEntity {
     @Field
     private DealEntity acceptedDeal;
 
-    @OneToMany(mappedBy = "offer")
-//    @Column(name = "deal_id")
-    @Field
-    private List<DealEntity> deals;
-
     public OfferEntity(CarEntity car, SellerEntity seller, int price) {
         this.car = car;
         this.seller = seller;

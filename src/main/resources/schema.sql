@@ -38,9 +38,9 @@ UNIQUE (car_id, accepted_deal_id)
 CREATE TABLE IF NOT EXISTS deal (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   customer_id  BIGINT NOT NULL,
-  sale_id BIGINT NOT NULL,
+  offer_id BIGINT NOT NULL,
   price INTEGER check (price > 0),
   state ENUM('active', 'rejected', 'accepted'),
 FOREIGN KEY (customer_id) REFERENCES customer(id),
-FOREIGN KEY (sale_id) REFERENCES offer(id) ON DELETE CASCADE,
+FOREIGN KEY (offer_id) REFERENCES offer(id) ON DELETE CASCADE,
 );

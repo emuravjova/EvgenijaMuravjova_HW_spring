@@ -1,12 +1,13 @@
 package com.playtika.automation.carshop.web;
 
+import com.playtika.automation.carshop.dao.entity.DealEntity;
 import com.playtika.automation.carshop.domain.Car;
 import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.domain.Customer;
 import com.playtika.automation.carshop.domain.SaleInfo;
 import com.playtika.automation.carshop.service.CarService;
 import com.playtika.automation.carshop.web.dto.CarId;
-import com.playtika.automation.carshop.web.dto.DealId;
+import com.playtika.automation.carshop.web.dto.DealInfo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -79,38 +81,33 @@ public class CarController {
     @ApiOperation(value = "Create new deal")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Deal with an ID was successfully created"),
-            @ApiResponse(code = 400, message = "Not all required parameters are received"),
             @ApiResponse(code = 404, message = "Such car is not on sale or no such car at all")})
-    public DealId createDeal (
+    public DealInfo createDeal (
             @Valid @RequestBody Customer customer,
             @ApiParam(name = "price", required = true, defaultValue = "20000")
             @NotEmpty @RequestParam("price") int price,
             @ApiParam(name = "carId", required = true, defaultValue = "1")
             @NotEmpty @RequestParam("carId") Long id){
-        long dealId = carService.createDeal(id, price, customer)
-                .orElseThrow(() -> new CarNotOnSaleException("Such car is not on sale or no such car at all!"))
-                .getId();
-        return new DealId(dealId);
+        DealEntity deal = carService.createDeal(id, price, customer)
+                .orElseThrow(() -> new CarOnSaleNotFoundException("Such car is not on sale or no such car at all!"));
+        return new DealInfo(deal.getId(), deal.getOffer().getId());
     }
 
     @GetMapping(value = "/offer/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find the best deal by offer id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The best deal is successfully found for offer"),
-            @ApiResponse(code = 400, message = "Not all required parameters are received"),
             @ApiResponse(code = 404, message = "No best deal found for open offer")})
-    public DealId findTheBestDeal (@PathVariable("id") long id){
-        long dealId = carService.findTheBestDeal(id)
-                .orElseThrow(() -> new NoBestDealForOpenOfferException("Such offer is already closed or no deal found for open offer"))
-                .getId();
-        return new DealId(dealId);
+    public DealInfo findTheBestDeal (@PathVariable("id") long id){
+        DealEntity deal = carService.findTheBestDeal(id)
+                .orElseThrow(() -> new NoBestDealForOpenOfferException("Such offer is already closed or no deal found for open offer"));
+        return new DealInfo(deal.getId(), deal.getOffer().getId());
     }
 
     @PutMapping(value = "/acceptDeal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Accept deal")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The deal is successfully accepted"),
-            @ApiResponse(code = 400, message = "Not all required parameters are received"),
             @ApiResponse(code = 409, message = "Deal cannot be accepted for closed offer")})
     public ResponseEntity<Void> acceptDeal (@PathVariable("id") long id){
         if (carService.acceptDeal(id)) {
@@ -123,8 +120,7 @@ public class CarController {
     @PutMapping(value = "/rejectDeal/{id}")
     @ApiOperation(value = "Reject deal")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "The deal is successfully rejected"),
-            @ApiResponse(code = 400, message = "Not all required parameters are received")})
+            @ApiResponse(code = 200, message = "The deal is successfully rejected")})
     public void rejectDeal (@PathVariable("id") long id) {
         carService.rejectDeal(id);
     }

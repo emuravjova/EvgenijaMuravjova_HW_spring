@@ -1,6 +1,6 @@
 <dataset>
-    <OFFER id ="1" car_id="1" seller_id="1" price="12000" deal_id="1"/>
-    <OFFER id ="2" car_id="1" seller_id="1" price="15000" deal_id="2"/>
+    <OFFER id ="1" car_id="1" seller_id="1" price="12000" accepted_deal_id="1"/>
+    <OFFER id ="2" car_id="1" seller_id="1" price="15000" accepted_deal_id="2"/>
     <CAR  id ="1" number="AS123" brand="BMW" year="2007" color="blue"/>
     <SELLER id="1" name="Den" contacts="0501234567"/>
     <DEAL id="1" customer_id="1" sale_id="1" price ="15000"/>

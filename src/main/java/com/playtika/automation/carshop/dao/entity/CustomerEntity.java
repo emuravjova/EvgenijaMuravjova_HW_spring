@@ -1,9 +1,7 @@
 package com.playtika.automation.carshop.dao.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,11 +12,12 @@ import javax.persistence.Table;
 /**
  * Created by emuravjova on 1/19/2018.
  */
-
-@Entity
-@Getter
 @Setter
+@Getter
+@Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 @Table(name = "customer")
 public class CustomerEntity {
 
