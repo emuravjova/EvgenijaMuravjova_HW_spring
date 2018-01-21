@@ -112,7 +112,7 @@ public class CarServiceImpl implements CarService {
         Optional<OfferEntity> offer = offerRepo.findByIdAndAcceptedDealIsNull(id);
         boolean offerIsClosed = !offer.isPresent();
         if (offerIsClosed){
-            log.info("Offer is aldeady closed or not exist");
+            log.info("Offer is already closed or not exist");
             return Optional.empty();
         }
         return findDealWithMaxPrice(offer.get());

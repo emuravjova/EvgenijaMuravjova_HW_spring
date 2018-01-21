@@ -27,6 +27,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -80,5 +81,17 @@ public class JpaOfferDaoTest {
     @DataSet(value = "offers-table.xml", disableConstraints = true, useSequenceFiltering = false)
     public void shouldReturnEmptyResultIfOfferWithOutDealByCarIdNotFound() {
         assertTrue(jpaOfferDao.findByCarIdAndAcceptedDealIsNull(2L).isEmpty());
+    }
+
+    @Test
+    @DataSet(value = "offers-table.xml", disableConstraints = true, useSequenceFiltering = false)
+    public void shouldFindOpenOfferById(){
+        assertTrue(jpaOfferDao.findByIdAndAcceptedDealIsNull(1L).isPresent());
+    }
+
+    @Test
+    @DataSet(value = "offers-with-deals-table.xml", disableConstraints = true, useSequenceFiltering = false)
+    public void shouldNotFindOpenOfferByIdIfNoOne(){
+        assertFalse(jpaOfferDao.findByIdAndAcceptedDealIsNull(1L).isPresent());
     }
 }
