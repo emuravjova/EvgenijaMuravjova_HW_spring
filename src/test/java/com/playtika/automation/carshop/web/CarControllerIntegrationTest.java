@@ -147,19 +147,19 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn400whenCarIdPriceAreAbsentOnCreateDeal() throws Exception {
-        postDeal(null,null,createCustomerInJson("Den","1111"))
+        postDeal(null, null, createCustomerInJson("Den", "1111"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void shouldReturn400whenPriceAreEmptyOnCreateDeal() throws Exception {
-        postDeal("","",createCustomerInJson("Den","1111"))
+        postDeal("", "", createCustomerInJson("Den", "1111"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void shouldReturn400whenCustomerIsEmptyOnCreateDeal() throws Exception {
-        postDeal(String.valueOf(20000),String.valueOf(1L),createCustomerInJson("",""))
+        postDeal(String.valueOf(20000), String.valueOf(1L), createCustomerInJson("", ""))
                 .andExpect(status().isBadRequest());
     }
 
@@ -175,11 +175,11 @@ public class CarControllerIntegrationTest {
     @Test
     public void shouldReturn200whenDealWasCreated() throws Exception {
         DealEntity deal = createDeal();
-        Customer customer = new Customer(deal.getCustomer().getName(),deal.getCustomer().getContacts());
+        Customer customer = new Customer(deal.getCustomer().getName(), deal.getCustomer().getContacts());
         Long carId = deal.getOffer().getCar().getId();
         when(carService.createDeal(carId, deal.getPrice(), customer))
                 .thenReturn(Optional.of(deal));
-        postDeal(String.valueOf(deal.getPrice()), String.valueOf(carId),createCustomerInJson(customer.getName(),customer.getContacts()))
+        postDeal(String.valueOf(deal.getPrice()), String.valueOf(carId), createCustomerInJson(customer.getName(), customer.getContacts()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.id").value(1L))
@@ -188,10 +188,10 @@ public class CarControllerIntegrationTest {
 
     @Test
     public void shouldReturn404whenCarIsNotOnSale() throws Exception {
-        Customer customer = new Customer("Den","1111");
+        Customer customer = new Customer("Den", "1111");
         when(carService.createDeal(1L, 1000, customer))
                 .thenReturn(Optional.empty());
-        postDeal(String.valueOf(1000), String.valueOf(1L),createCustomerInJson(customer.getName(),customer.getContacts()))
+        postDeal(String.valueOf(1000), String.valueOf(1L), createCustomerInJson(customer.getName(), customer.getContacts()))
                 .andExpect(status().isNotFound());
     }
 
@@ -258,12 +258,12 @@ public class CarControllerIntegrationTest {
                 .content(body));
     }
 
-    private static DealEntity createDeal(){
+    private static DealEntity createDeal() {
         CarEntity car = new CarEntity(1L, "AS123", "BMW", 2007, "blue");
-        SellerEntity seller = new SellerEntity(1L,"John doe", "0501234567");
+        SellerEntity seller = new SellerEntity(1L, "John doe", "0501234567");
         OfferEntity offer = new OfferEntity(car, seller, 20000);
         offer.setId(1L);
-        CustomerEntity customer = new CustomerEntity(1L,"Den","1111");
+        CustomerEntity customer = new CustomerEntity(1L, "Den", "1111");
         DealEntity deal = new DealEntity(1L, customer, offer, 25000, DealEntity.State.ACTIVE);
         return deal;
     }

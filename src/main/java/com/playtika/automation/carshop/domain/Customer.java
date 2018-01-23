@@ -1,6 +1,5 @@
 package com.playtika.automation.carshop.domain;
 
-import com.couchbase.client.java.repository.annotation.Field;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Value;

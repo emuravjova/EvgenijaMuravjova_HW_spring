@@ -1,10 +1,8 @@
-package com.playtika.automation.carshop.dao.jpa;
+package com.playtika.automation.carshop.dao;
 
 import com.github.database.rider.core.DBUnitRule;
 import com.github.database.rider.core.api.dataset.DataSet;
-import com.playtika.automation.carshop.context.JpaRepositoryContext;
-import com.playtika.automation.carshop.dao.SellerDao;
-import com.playtika.automation.carshop.dao.entity.CarEntity;
+import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import com.playtika.automation.carshop.dao.entity.SellerEntity;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
@@ -20,14 +18,12 @@ import java.util.Optional;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
 
 /**
  * Created by emuravjova on 12/8/2017.
  */
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = JpaRepositoryContext.class)
 @DataJpaTest
 public class JpaSellerDaoTest {
     @Autowired
@@ -40,17 +36,25 @@ public class JpaSellerDaoTest {
     private JpaSellerDao jpaSellerDao;
 
     @Test
+    @DataSet(value = "empty-seller-table.xml", disableConstraints = true)
+    @ExpectedDataSet(value = "seller-table.xml", ignoreCols = "id")
+    @Commit
+    public void shouldSaveSeller() {
+        jpaSellerDao.save(new SellerEntity(1L, "Sam", "0969258649"));
+    }
+
+    @Test
     @DataSet(value = "seller-table.xml", disableConstraints = true)
-    public void shouldFindSellerByContact(){
+    public void shouldFindSellerByContact() {
+        SellerEntity expectedSeller = new SellerEntity(1L, "Sam", "0969258649");
         Optional<SellerEntity> actualFoundSeller = jpaSellerDao.findFirstByContacts("0969258649");
-        SellerEntity expectedSeller = new SellerEntity("Sam", "0969258649");
-        expectedSeller.setId(1L);
         assertThat(actualFoundSeller.get(), equalTo(expectedSeller));
     }
 
     @Test
     @DataSet(value = "seller-table.xml", disableConstraints = true)
-    public void shouldReturnEmptyResultIfNoSellerFound(){
+    public void shouldReturnEmptyResultIfNoSellerFound() {
         assertThat(jpaSellerDao.findFirstByContacts("0961111111"), isEmpty());
     }
+
 }

@@ -2,7 +2,6 @@ package com.playtika.automation.carshop.domain;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Value;
 
 /**

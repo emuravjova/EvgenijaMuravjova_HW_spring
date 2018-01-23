@@ -1,29 +1,30 @@
 package com.playtika.automation.carshop.dao.entity;
 
 import com.couchbase.client.java.repository.annotation.Field;
-import lombok.*;
-import org.springframework.data.annotation.*;
-import org.springframework.data.couchbase.core.mapping.Document;
-import org.springframework.data.couchbase.core.mapping.id.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Transient;
-import java.util.UUID;
+import javax.persistence.Table;
 
-@Data
+@Setter
+@Getter
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Document
 @Table(name = "car")
 public class CarEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @com.couchbase.client.java.repository.annotation.Id
-    @org.springframework.data.couchbase.core.mapping.id.GeneratedValue
     private Long id;
 
     @Field

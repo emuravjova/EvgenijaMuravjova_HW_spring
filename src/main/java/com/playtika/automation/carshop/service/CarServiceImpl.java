@@ -1,10 +1,10 @@
 package com.playtika.automation.carshop.service;
 
-import com.playtika.automation.carshop.dao.CarDao;
-import com.playtika.automation.carshop.dao.CustomerDao;
-import com.playtika.automation.carshop.dao.DealDao;
-import com.playtika.automation.carshop.dao.OfferDao;
-import com.playtika.automation.carshop.dao.SellerDao;
+import com.playtika.automation.carshop.dao.JpaCarDao;
+import com.playtika.automation.carshop.dao.JpaCustomerDao;
+import com.playtika.automation.carshop.dao.JpaDealDao;
+import com.playtika.automation.carshop.dao.JpaOfferDao;
+import com.playtika.automation.carshop.dao.JpaSellerDao;
 import com.playtika.automation.carshop.dao.entity.CarEntity;
 import com.playtika.automation.carshop.dao.entity.CustomerEntity;
 import com.playtika.automation.carshop.dao.entity.DealEntity;
@@ -15,7 +15,6 @@ import com.playtika.automation.carshop.domain.CarSaleDetails;
 import com.playtika.automation.carshop.domain.Customer;
 import com.playtika.automation.carshop.domain.SaleInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -31,18 +30,17 @@ import java.util.stream.Collectors;
 @Transactional
 public class CarServiceImpl implements CarService {
 
-    private final OfferDao offerRepo;
-    private final CarDao carRepo;
-    private final SellerDao sellerRepo;
-    private final CustomerDao customerRepo;
-    private final DealDao dealRepo;
+    private final JpaOfferDao offerRepo;
+    private final JpaCarDao carRepo;
+    private final JpaSellerDao sellerRepo;
+    private final JpaCustomerDao customerRepo;
+    private final JpaDealDao dealRepo;
 
-    public CarServiceImpl(@Qualifier("jpaOfferDao") OfferDao offerRepo,
-                          @Qualifier("jpaCarDao") CarDao carRepo,
-                          @Qualifier("jpaSellerDao") SellerDao sellerRepo,
-                          @Qualifier("jpaCustomerDao") CustomerDao customerRepo,
-                          @Qualifier("jpaDealDao") DealDao dealRepo){
-//    public CarServiceImpl(@Qualifier("couchbaseOfferDao") OfferDao offerRepo, @Qualifier("couchbaseCarDao") CarDao carRepo, @Qualifier("couchbaseSellerDao") SellerDao sellerRepo){
+    public CarServiceImpl(JpaOfferDao offerRepo,
+                          JpaCarDao carRepo,
+                          JpaSellerDao sellerRepo,
+                          JpaCustomerDao customerRepo,
+                          JpaDealDao dealRepo) {
         this.offerRepo = offerRepo;
         this.carRepo = carRepo;
         this.sellerRepo = sellerRepo;
@@ -111,7 +109,7 @@ public class CarServiceImpl implements CarService {
     public Optional<DealEntity> findTheBestDeal(Long id) {
         Optional<OfferEntity> offer = offerRepo.findByIdAndAcceptedDealIsNull(id);
         boolean offerIsClosed = !offer.isPresent();
-        if (offerIsClosed){
+        if (offerIsClosed) {
             log.info("Offer is already closed or not exist");
             return Optional.empty();
         }
@@ -123,7 +121,7 @@ public class CarServiceImpl implements CarService {
         DealEntity deal = dealRepo.findOne(id);
         Optional<OfferEntity> optionalOffer = offerRepo.findByIdAndAcceptedDealIsNull(deal.getOffer().getId());
         boolean offerIsClosed = !optionalOffer.isPresent();
-        if (offerIsClosed){
+        if (offerIsClosed) {
             log.info("Offer is already closed");
             return false;
         }
@@ -157,7 +155,7 @@ public class CarServiceImpl implements CarService {
 
     private Optional<DealEntity> findDealWithMaxPrice(OfferEntity offer) {
         List<DealEntity> deals = dealRepo.findByOfferId(offer.getId());
-        if (deals.isEmpty()){
+        if (deals.isEmpty()) {
             log.info("No deals present for offer with id {}", offer.getId());
             return Optional.empty();
         }

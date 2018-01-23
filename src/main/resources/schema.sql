@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS offer (
   price INTEGER check (price > 0),
   accepted_deal_id BIGINT,
 FOREIGN KEY (car_id) REFERENCES car(id) ON DELETE CASCADE,
-FOREIGN KEY (seller_id) REFERENCES seller(id),
+FOREIGN KEY (seller_id) REFERENCES seller(id) ON DELETE CASCADE,
 UNIQUE (car_id, accepted_deal_id)
 );
 

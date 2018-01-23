@@ -5,7 +5,7 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude={"carId"})
+@EqualsAndHashCode(exclude = {"carId"})
 public class CarSaleDetails {
     private long carId;
     private Car car;

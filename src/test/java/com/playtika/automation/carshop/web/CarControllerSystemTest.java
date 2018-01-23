@@ -19,7 +19,7 @@ public class CarControllerSystemTest {
 
     @Test
     public void shouldAddCar() throws Exception {
-        Car car = new Car("AA123", "BMW", 2007, "blue");
+        Car car = new Car("AM123", "BMW", 2007, "blue");
         given()
                 .contentType("application/json")
                 .body(car)
@@ -57,7 +57,7 @@ public class CarControllerSystemTest {
 
     @Test
     public void shouldDeleteCar() throws Exception {
-        Car car = new Car("AD123", "BMW", 2007, "blue");
+        Car car = new Car("AG123", "BMW", 2007, "blue");
         long id = addCarAndGetId(car);
         given().when().delete("/cars/{id}", id).then().statusCode(200);
         given().when().get("/cars").then().assertThat().body("id", not(hasValue(id)));
@@ -65,7 +65,7 @@ public class CarControllerSystemTest {
 
     @Test
     public void shouldCreateDeal() throws Exception {
-        Car car = new Car("AD123", "BMW", 2007, "blue");
+        Car car = new Car("AE123", "BMW", 2007, "blue");
         Customer customer = new Customer("Den", "0896543456");
         long id = addCarAndGetId(car);
         given()
@@ -79,21 +79,21 @@ public class CarControllerSystemTest {
 
     @Test
     public void shouldGetBestDeal() throws Exception {
-        Car car = new Car("AD123", "BMW", 2007, "blue");
+        Car car = new Car("AR123", "BMW", 2007, "blue");
         Customer customer = new Customer("Den", "0896543456");
-        long id = createDealAndGetOfferId(car,customer);
+        long id = createDealAndGetOfferId(car, customer);
         given()
                 .when().get("/offer/{id}", id)
                 .then()
-                .body("id", equalTo(1))
+                .body("id", greaterThan(0))
                 .statusCode(200);
     }
 
     @Test
     public void shouldAcceptDeal() throws Exception {
-        Car car = new Car("AD123", "BMW", 2007, "blue");
+        Car car = new Car("AT123", "BMW", 2007, "blue");
         Customer customer = new Customer("Den", "0896543456");
-        long id = createDealAndGetId(car,customer);
+        long id = createDealAndGetId(car, customer);
         given()
                 .when().put("/acceptDeal/{id}", id)
                 .then()
@@ -102,9 +102,9 @@ public class CarControllerSystemTest {
 
     @Test
     public void shouldRejectDeal() throws Exception {
-        Car car = new Car("AD123", "BMW", 2007, "blue");
+        Car car = new Car("AU123", "BMW", 2007, "blue");
         Customer customer = new Customer("Den", "0896543456");
-        long id = createDealAndGetId(car,customer);
+        long id = createDealAndGetId(car, customer);
         given()
                 .when().put("/rejectDeal/{id}", id)
                 .then()

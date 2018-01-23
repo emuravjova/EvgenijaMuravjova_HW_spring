@@ -1,10 +1,10 @@
 <dataset>
-    <OFFER id ="1" car_id="1" seller_id="1" price="12000" accepted_deal_id="1"/>
-    <OFFER id ="2" car_id="1" seller_id="1" price="15000" accepted_deal_id="2"/>
+    <OFFER id ="1" car_id="1" seller_id="1" price="20000" accepted_deal_id="1"/>
+    <OFFER id ="2" car_id="2" seller_id="1" price="15000" accepted_deal_id="2"/>
     <CAR  id ="1" number="AS123" brand="BMW" year="2007" color="blue"/>
-    <SELLER id="1" name="Den" contacts="0501234567"/>
-    <DEAL id="1" customer_id="1" offer_id="1" price ="15000"/>
-    <DEAL id="2" customer_id="2" offer_id="2" price ="12000"/>
-    <CUSTOMER id="1" name="Nick" contacts="0502568923"/>
-    <CUSTOMER id="2" name="Rob" contacts="0502596482"/>
+    <CAR  id ="2" number="AD123" brand="Lexus" year="2015" color="green"/>
+    <SELLER id="1" name="John doe" contacts="0501234567"/>
+    <DEAL id="1" customer_id="1" offer_id="1" price ="25000"/>
+    <DEAL id="2" customer_id="1" offer_id="2" price ="45000"/>
+    <CUSTOMER id="1" name="Den" contacts="1111"/>
 </dataset>

@@ -9,11 +9,18 @@ import java.util.Optional;
 
 public interface CarService {
     Collection<CarSaleDetails> getAllCars();
+
     Optional<CarSaleDetails> getCarDetailsById(long id);
+
     boolean deleteCarById(long id);
+
     long addCar(CarSaleDetails carToAdd);
+
     Optional<DealEntity> createDeal(Long id, int price, Customer customer);
+
     Optional<DealEntity> findTheBestDeal(Long id);
+
     boolean acceptDeal(long id);
+
     void rejectDeal(long id);
 }
